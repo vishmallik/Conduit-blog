@@ -16,4 +16,7 @@
   .active-link {
     color: rgb(121, 33, 2);
   }
+  .m-1\/2 {
+    margin: 0.125rem;
+  }
 }
