@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: Noto Sans, sans-serif;
+  }
+}
+@layer components {
+  .container-md {
+    width: 100%;
+    margin: 0 auto;
+    max-width: 70%;
+  }
+  .active-link {
+    color: rgb(121, 33, 2);
+  }
+  .m-1\/2 {
+    margin: 0.125rem;
+  }
+}
