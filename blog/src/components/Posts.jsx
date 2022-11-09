@@ -15,7 +15,7 @@ export default function Posts(props) {
     );
   }
   if (articles.length < 1) {
-    <h2 className="text-center font-2xl py-4">No articles found!!!</h2>;
+    return <h2 className="text-center font-2xl py-4">No articles found!!!</h2>;
   }
   return (
     <section>

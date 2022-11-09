@@ -30,7 +30,15 @@ export default class Home extends React.Component {
     let offset = (this.state.currentPageIndex - 1) * limit;
     let tag = this.state.activeTab;
     fetch(
-      articlesURL + `?limit=${limit}&offset=${offset}` + (tag && `&tag=${tag}`)
+      articlesURL +
+        (this.state.activeTab === "Your Feed" ? "/feed" : "") +
+        `?limit=${limit}&offset=${offset}` +
+        (tag && `&tag=${tag}`),
+      {
+        headers: {
+          Authorization: "Token " + this.props.user.token,
+        },
+      }
     )
       .then((res) => {
         if (!res.ok) {
@@ -78,6 +86,7 @@ export default class Home extends React.Component {
             <FeedNav
               activeTab={activeTab}
               updateActiveTab={this.updateActiveTab}
+              user={this.props.user}
             />
             <Posts articles={articles} error={error} />
             <Pagination

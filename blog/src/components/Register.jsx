@@ -1,9 +1,9 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { ROOT_URL } from "../utils/urls";
 import validate from "../utils/validate";
 
-export default class Register extends React.Component {
+class Register extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +16,6 @@ export default class Register extends React.Component {
         email: "",
         password: "",
         empty: true,
-        server_res: null,
       },
     };
   }
@@ -48,18 +47,18 @@ export default class Register extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.errors) {
-          this.setState({
-            errors: Object.assign(this.state.errors, {
-              server_res: data.errors,
-            }),
-          });
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        console.log(data);
-        this.setState({ user: data.user }, () => <Redirect to="/" />);
-      });
+        return res.json;
+      })
+      .then(({ user }) => {
+        this.props.updateUser(user);
+        this.setState({ email: "", password: "", username: "" });
+        this.props.history.push("/");
+      })
+      .catch((errors) => this.setState({ ...this.state.errors, errors }));
   };
   render() {
     let { username, password, email, empty } = this.state.errors;
@@ -140,3 +139,4 @@ export default class Register extends React.Component {
     );
   }
 }
+export default withRouter(Register);

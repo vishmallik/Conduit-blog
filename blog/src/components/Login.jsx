@@ -1,20 +1,18 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Link, Redirect, withRouter } from "react-router-dom";
 import { ROOT_URL } from "../utils/urls";
 import validate from "../utils/validate";
 
-export default class Login extends React.Component {
+class Login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
       email: "",
       password: "",
-      user: null,
       errors: {
         email: "",
         password: "",
         empty: true,
-        server_res: null,
       },
     };
   }
@@ -44,22 +42,31 @@ export default class Login extends React.Component {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.errors) {
-          this.setState({
-            errors: Object.assign(this.state.errors, {
-              server_res: data.errors,
-            }),
-          });
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        console.log(data);
-        this.setState({ user: data.user }, this.redirect);
-      });
+        return res.json();
+      })
+      .then(({ user }) => {
+        this.props.updateUser(user);
+        this.setState({ email: "", password: "" });
+        this.props.history.push("/");
+      })
+      .catch((errors) =>
+        this.setState((prevState) => {
+          return {
+            ...prevState,
+            errors: {
+              ...prevState.errors,
+              email: "Email/Password is Incorrect",
+            },
+          };
+        })
+      );
   };
   redirect = () => {
     if (this.state.user.token) {
-      console.log(this.state.user.token);
       return <Redirect to="/" />;
     }
   };
@@ -123,3 +130,4 @@ export default class Login extends React.Component {
     );
   }
 }
+export default withRouter(Login);
