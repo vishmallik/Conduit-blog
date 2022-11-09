@@ -4,6 +4,7 @@ import Error from "./Error";
 import Header from "./Header";
 import Home from "./Home";
 import Login from "./Login";
+import PrivateHome from "./PrivateHome";
 import Register from "./Register";
 
 export default function App() {
@@ -20,6 +21,9 @@ export default function App() {
         </Route>
         <Route path="/login">
           <Login />
+        </Route>
+        <Route path="/private">
+          <PrivateHome />
         </Route>
         <Route path="*">
           <Error />

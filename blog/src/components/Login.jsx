@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { ROOT_URL } from "../utils/urls";
 import validate from "../utils/validate";
 
 export default class Login extends React.Component {
@@ -8,10 +9,12 @@ export default class Login extends React.Component {
     this.state = {
       email: "",
       password: "",
+      user: null,
       errors: {
         email: "",
         password: "",
         empty: true,
+        server_res: null,
       },
     };
   }
@@ -26,6 +29,39 @@ export default class Login extends React.Component {
       [name]: value,
       errors,
     });
+  };
+  handleSubmit = (event) => {
+    event.preventDefault();
+    let { email, password } = event.target;
+    let data = {
+      user: {
+        email: email.value,
+        password: password.value,
+      },
+    };
+    fetch(ROOT_URL + "users/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.errors) {
+          this.setState({
+            errors: Object.assign(this.state.errors, {
+              server_res: data.errors,
+            }),
+          });
+        }
+        console.log(data);
+        this.setState({ user: data.user }, this.redirect);
+      });
+  };
+  redirect = () => {
+    if (this.state.user.token) {
+      console.log(this.state.user.token);
+      return <Redirect to="/" />;
+    }
   };
   render() {
     let { password, email, empty } = this.state.errors;
@@ -45,9 +81,8 @@ export default class Login extends React.Component {
           Need an account?
         </Link>
         <form
-          action="/users/login"
-          method="POST"
           className="flex flex-col w-1/3 mx-auto"
+          onSubmit={this.handleSubmit}
         >
           <input
             type="email"

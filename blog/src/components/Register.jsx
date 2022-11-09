@@ -1,5 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
+import { ROOT_URL } from "../utils/urls";
 import validate from "../utils/validate";
 
 export default class Register extends React.Component {
@@ -9,25 +10,56 @@ export default class Register extends React.Component {
       username: "",
       email: "",
       password: "",
+      user: null,
       errors: {
         username: "",
         email: "",
         password: "",
         empty: true,
+        server_res: null,
       },
     };
   }
   handleChange = (event) => {
     let { name, value } = event.target;
     let errors = { ...this.state.errors };
-    if (!value) {
-      errors.empty = true;
+    if (value) {
+      errors.empty = false;
     }
     validate(errors, name, value);
     this.setState({
       [name]: value,
       errors,
     });
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    let { username, email, password } = event.target;
+    let data = {
+      user: {
+        username: username.value,
+        email: email.value,
+        password: password.value,
+      },
+    };
+    fetch(ROOT_URL + "users", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.errors) {
+          this.setState({
+            errors: Object.assign(this.state.errors, {
+              server_res: data.errors,
+            }),
+          });
+        }
+        console.log(data);
+        this.setState({ user: data.user }, () => <Redirect to="/" />);
+      });
   };
   render() {
     let { username, password, email, empty } = this.state.errors;
@@ -46,10 +78,15 @@ export default class Register extends React.Component {
         >
           Have an account?
         </Link>
+        <span className="text-center block text-red-500 text-sm">
+          {this.state.errors.server_res
+            ? "Email " + this.state.errors.server_res.email ||
+              "Username " + this.state.errors.server_res.username
+            : ""}
+        </span>
         <form
-          action="/users"
-          method="POST"
           className="flex flex-col w-1/3 mx-auto"
+          onSubmit={this.handleSubmit}
         >
           <input
             type="text"
