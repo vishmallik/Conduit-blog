@@ -12,12 +12,16 @@ export default class Home extends React.Component {
     articlesPerPage: 10,
     articlesCount: 0,
     currentPageIndex: 1,
-    activeTab: "",
+    activeTab: this.props.isLoggedIn ? "Your Feed" : "",
   };
   componentDidMount() {
+    console.log("cDM.home", this.props);
+
     this.fetchData();
   }
   componentDidUpdate(prevProps, prevState) {
+    console.log("cDU.home");
+
     if (
       prevState.currentPageIndex !== this.state.currentPageIndex ||
       prevState.activeTab !== this.state.activeTab
@@ -29,6 +33,7 @@ export default class Home extends React.Component {
     let limit = this.state.articlesPerPage;
     let offset = (this.state.currentPageIndex - 1) * limit;
     let tag = this.state.activeTab;
+
     fetch(
       articlesURL +
         (this.state.activeTab === "Your Feed" ? "/feed" : "") +
@@ -36,7 +41,7 @@ export default class Home extends React.Component {
         (tag && `&tag=${tag}`),
       {
         headers: {
-          Authorization: "Token " + this.props.user.token,
+          Authorization: `Token ${this.props.user.token}`,
         },
       }
     )
@@ -86,7 +91,7 @@ export default class Home extends React.Component {
             <FeedNav
               activeTab={activeTab}
               updateActiveTab={this.updateActiveTab}
-              user={this.props.user}
+              isLoggedIn={this.props.isLoggedIn}
             />
             <Posts articles={articles} error={error} />
             <Pagination

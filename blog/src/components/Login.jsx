@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, Redirect, withRouter } from "react-router-dom";
-import { ROOT_URL } from "../utils/urls";
+import { loginURL } from "../utils/urls";
 import validate from "../utils/validate";
 
 class Login extends React.Component {
@@ -37,7 +37,7 @@ class Login extends React.Component {
         password: password.value,
       },
     };
-    fetch(ROOT_URL + "users/login", {
+    fetch(loginURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
@@ -50,7 +50,7 @@ class Login extends React.Component {
       })
       .then(({ user }) => {
         this.props.updateUser(user);
-        this.setState({ email: "", password: "" });
+        // this.setState({ email: "", password: "" });
         this.props.history.push("/");
       })
       .catch((errors) =>

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
-import { ROOT_URL } from "../utils/urls";
+import { registerURL } from "../utils/urls";
 import validate from "../utils/validate";
 
 class Register extends React.Component {
@@ -42,7 +42,7 @@ class Register extends React.Component {
         password: password.value,
       },
     };
-    fetch(ROOT_URL + "users", {
+    fetch(registerURL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),

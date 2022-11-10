@@ -19,4 +19,7 @@
   .m-1\/2 {
     margin: 0.125rem;
   }
+  .border-1 {
+    border-width: 1px;
+  }
 }

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 export default function FeedNav(props) {
   return (
     <>
-      {props.user ? (
+      {props.isLoggedIn ? (
         <Link
           className={`px-1 mr-2  ${
             props.activeTab === "Your Feed"
