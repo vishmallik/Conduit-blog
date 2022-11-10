@@ -8,13 +8,18 @@ export default function Post(props) {
     rounded-md overflow-hidden"
     >
       <div className="flex items-center">
-        <img
-          src={author.image || "/images/smiley-cyrus.jpg"}
-          alt={author.username}
-          className="w-10 h-10 rounded-full"
-        />
+        <Link to={`/@${author.username}`}>
+          <img
+            src={author.image || "/images/smiley-cyrus.jpg"}
+            alt={author.username}
+            className="w-10 h-10 rounded-full"
+          />
+        </Link>
+
         <div className="basis-11/12 pl-4">
-          <p className="text-red-600">{author.username}</p>
+          <Link to={`/@${author.username}`}>
+            <p className="text-red-600 hover:underline">{author.username}</p>
+          </Link>
           <p className="text-gray-400 text-xs">
             {new Date(createdAt).toDateString()}
           </p>

@@ -5,6 +5,7 @@ const localStorageKey = "app_user";
 const loginURL = ROOT_URL + "users/login";
 const registerURL = ROOT_URL + "users";
 const verifyURL = ROOT_URL + "user";
+const profileURL = ROOT_URL + "profiles";
 
 export {
   ROOT_URL,
@@ -14,4 +15,5 @@ export {
   registerURL,
   localStorageKey,
   verifyURL,
+  profileURL,
 };

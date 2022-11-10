@@ -11,6 +11,7 @@ import LoaderFull from "./Loader Full";
 import NewPost from "./NewPost";
 import Setting from "./Setting";
 import Profile from "./Profile";
+import User from "./User";
 
 export default class App extends React.Component {
   state = {
@@ -26,9 +27,13 @@ export default class App extends React.Component {
     });
     localStorage.setItem(localStorageKey, user.token);
   };
+  updateIsLoggedIn = () => {
+    this.setState({
+      isLoggedIn: false,
+    });
+  };
 
   componentDidMount = () => {
-    console.log("cdm.app");
     let key = localStorage[localStorageKey];
     if (key) {
       fetch(verifyURL, {
@@ -59,6 +64,8 @@ export default class App extends React.Component {
           <AuthenticatedApp
             isLoggedIn={this.state.isLoggedIn}
             user={this.state.user}
+            updateUser={this.updateUser}
+            updateIsLoggedIn={this.updateIsLoggedIn}
           />
         ) : (
           <UnAuthenticatedApp
@@ -78,11 +85,16 @@ function AuthenticatedApp(props) {
         <Home isLoggedIn={props.isLoggedIn} user={props.user} />
       </Route>
       <Route path="/editor">
-        <NewPost />
+        <NewPost user={props.user} />
       </Route>
-      <Route path="/settings" user={props.user}>
-        <Setting />
+      <Route path="/settings">
+        <Setting
+          user={props.user}
+          updateUser={props.updateUser}
+          updateIsLoggedIn={props.updateIsLoggedIn}
+        />
       </Route>
+      <Route path="/@:username" component={User} />
       <Route path="/profile">
         <Profile />
       </Route>

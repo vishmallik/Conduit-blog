@@ -48,14 +48,16 @@ class Register extends React.Component {
       body: JSON.stringify(data),
     })
       .then((res) => {
+        console.log(res);
         if (!res.ok) {
           return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        return res.json;
+        return res.json();
       })
       .then(({ user }) => {
+        console.log(user);
         this.props.updateUser(user);
-        this.setState({ email: "", password: "", username: "" });
+        // this.setState({ email: "", password: "", username: "" });
         this.props.history.push("/");
       })
       .catch((errors) => this.setState({ ...this.state.errors, errors }));

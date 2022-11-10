@@ -65,6 +65,7 @@ function AuthHeader(props) {
         </NavLink>
       </li>
       <li className="pl-4 hover:text-orange-700">
+        {console.log(props, "AuthHeader")}
         <NavLink to={`/@${props.user.username}`} activeClassName="active-link">
           <i className="fas fa-user px-2"></i>
           <p className="inline-block">{props.user.username}</p>
