@@ -20,7 +20,12 @@ export default function Posts(props) {
   return (
     <section>
       {articles.map((article) => (
-        <Post article={article} key={article.slug} />
+        <Post
+          article={article}
+          isLoggedIn={props.isLoggedIn}
+          key={article.slug}
+          handleFavorite={props.handleFavorite}
+        />
       ))}
     </section>
   );

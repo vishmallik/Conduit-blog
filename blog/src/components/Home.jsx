@@ -89,7 +89,13 @@ export default class Home extends React.Component {
               updateActiveTab={this.updateActiveTab}
               isLoggedIn={this.props.isLoggedIn}
             />
-            <Posts articles={articles} error={error} />
+            <Posts
+              articles={articles}
+              error={error}
+              handleFollow={this.props.handleFollow}
+              handleFavorite={this.props.handleFavorite}
+              isLoggedIn={this.props.isLoggedIn}
+            />
             <Pagination
               articlesCount={articlesCount}
               articlesPerPage={articlesPerPage}

@@ -65,7 +65,6 @@ function AuthHeader(props) {
         </NavLink>
       </li>
       <li className="pl-4 hover:text-orange-700">
-        {console.log(props, "AuthHeader")}
         <NavLink
           to={`/profile/@${props.user.username}`}
           activeClassName="active-link"

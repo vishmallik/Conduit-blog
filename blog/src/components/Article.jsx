@@ -2,8 +2,7 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { articlesURL } from "../utils/urls";
 import Loader from "./Loader";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import Comments from "./Comments";
 
 class Article extends React.Component {
   state = {
@@ -28,6 +27,27 @@ class Article extends React.Component {
         this.setState({ error: "Unable to fetch article" });
       });
   }
+  handleDelete = () => {
+    fetch(articlesURL + `/${this.state.article.slug}`, {
+      method: "DELETE",
+      headers: {
+        authorization: `Token ${this.props.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
+      })
+
+      .catch((err) => {
+        this.setState({ error: "Unable to delete article" });
+      });
+  };
+  handleEdit = () => {
+    //WIP
+  };
+
   render() {
     let { article, error } = this.state;
     if (error) {
@@ -65,15 +85,28 @@ class Article extends React.Component {
                   {new Date(article.createdAt).toDateString()}
                 </p>
               </div>
+              {article.author.username === this.props.user.username ? (
+                <UserButtons
+                  handleDelete={this.handleDelete}
+                  handleEdit={this.handleEdit}
+                />
+              ) : (
+                <OtherUserButtons
+                  handleFollow={this.props.handleFollow}
+                  article={article}
+                  handleFavorite={this.props.handleFavorite}
+                />
+              )}
             </div>
           </div>
         </div>
         <div className="container-md ">
           <p className="whitespace-pre-line text-lg text-justify py-6">
-            <ReactMarkdown
-              children={article.body}
+            {/* <ReactMarkdown
+              children=
               remarkPlugins={[remarkGfm]}
-            />
+            /> */}
+            {article.body}
           </p>
           <ul>
             {article.tagList.map((tag) => {
@@ -90,47 +123,169 @@ class Article extends React.Component {
             })}
           </ul>
           <hr className="my-4" />
-          {this.props.user ? (
-            <AuthenticatedFooter user={this.props.user} />
+          {this.props.isLoggedIn ? (
+            <AuthenticatedFooter user={this.props.user} slug={article.slug} />
           ) : (
-            <UnAuthenticatedFooter />
+            <UnAuthenticatedFooter user={this.props.user} slug={article.slug} />
           )}
         </div>
       </>
     );
   }
 }
-
-function AuthenticatedFooter(props) {
+function OtherUserButtons(props) {
   return (
-    <footer>
-      <form action="" className="mx-auto w-1/2 font-0 my-4">
-        <textarea
-          name=""
-          id=""
-          rows="5"
-          placeholder="Write a comment"
-          className="w-full border-1 border-solid border-grey-200 rounded-t-md  mb-0 p-4 text-base focus:outline-0"
-        ></textarea>
-        <div className="border-1 border-solid border-grey-200 rounded-b-md mt-0 py-2 text-base flex justify-between items-center px-2 bg-gray-200">
-          <img
-            src={props.user.image}
-            alt={props.user.username}
-            className="w-8 h-8 rounded-full"
-          />
-          <input
-            type="submit"
-            value="Post Comment"
-            className="bg-amber-500 text-white 
-          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
-          />
-        </div>
-      </form>
-    </footer>
+    <>
+      {props.article.author.following ? (
+        <button
+          className="px-2 py-1 border-1 border-solid
+        border-green-500 text-green-500 rounded-md
+        ml-10 block hover:bg-green-500 text-sm font-bold
+        hover:text-white"
+          onClick={() =>
+            props.handleFollow("DELETE", props.article.author.username)
+          }
+        >
+          <i className="fas fa-minus pr-2"></i>
+          UnFollow {props.article.author.username}
+        </button>
+      ) : (
+        <button
+          className="px-2 py-1 border-1 border-solid
+        border-green-500 text-green-500 rounded-md
+          ml-10 block hover:bg-green-500 text-sm font-bold
+          hover:text-white"
+          onClick={() =>
+            props.handleFollow("POST", props.article.author.username)
+          }
+        >
+          <i className="fas fa-plus pr-2"></i>
+          Follow {props.article.author.username}
+        </button>
+      )}
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-teal-500 text-teal-500 rounded-md
+          ml-4 block hover:bg-teal-500 text-sm font-bold
+          hover:text-white"
+        onClick={() => props.handleFavorite("POST", props.article.slug)}
+      >
+        <i className="fas fa-heart pr-2"></i>
+        Favorite Post
+      </button>
+    </>
+  );
+}
+function UserButtons(props) {
+  return (
+    <>
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-cyan-500 text-cyan-500 rounded-md
+          ml-10 block hover:bg-cyan-500 text-sm font-bold
+          hover:text-white"
+        onClick={props.handleEdit}
+      >
+        <i className="fas fa-pen pr-2"></i>
+        Edit Article
+      </button>
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-red-500 text-red-500 rounded-md
+          ml-2 block hover:bg-red-500 text-sm font-bold
+          hover:text-white"
+        onClick={props.handleDelete}
+      >
+        <i className="fas fa-trash pr-2"></i>
+        Delete Article
+      </button>
+    </>
   );
 }
 
-function UnAuthenticatedFooter() {
+class AuthenticatedFooter extends React.Component {
+  state = {
+    comment: "",
+    errors: {
+      comment: "",
+    },
+  };
+  handleChange = ({ target }) => {
+    let { value } = target;
+    this.setState({
+      comment: value,
+    });
+  };
+  handleSubmit = (event) => {
+    event.preventDefault();
+    fetch(articlesURL + `/${this.props.slug}/comments`, {
+      method: "POST",
+      headers: {
+        authorization: `Token ${this.props.user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ comment: { body: this.state.comment } }),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        return res.json();
+      })
+      .then(({ comment }) => {
+        this.setState({ comment: "" });
+      })
+      .catch((errors) =>
+        this.setState({ errors: { comment: "Couldn't Post comment" } })
+      );
+  };
+  render() {
+    return (
+      <footer>
+        <form
+          action=""
+          className="mx-auto w-1/2 font-0 my-4"
+          onSubmit={this.handleSubmit}
+        >
+          <textarea
+            id=""
+            value={this.state.comment}
+            rows="5"
+            name="comment"
+            placeholder="Write a comment"
+            onChange={this.handleChange}
+            className="w-full border-1 border-solid border-grey-200
+           rounded-t-md  mb-0 p-4 text-base focus:outline-0"
+          ></textarea>
+          <div
+            className="border-1 border-solid border-grey-200
+         rounded-b-md mt-0 py-2 text-base flex justify-between
+          items-center px-2 bg-gray-200"
+          >
+            <img
+              src={this.props.user.image}
+              alt={this.props.user.username}
+              className="w-8 h-8 rounded-full"
+            />
+            <input
+              type="submit"
+              value="Post Comment"
+              className="bg-amber-500 text-white 
+          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
+            />
+          </div>
+        </form>
+
+        {/* View all comments */}
+        <div className="mx-auto w-1/2 my-4">
+          <Comments slug={this.props.slug} user={this.props.user} />
+        </div>
+      </footer>
+    );
+  }
+}
+
+function UnAuthenticatedFooter(props) {
   return (
     <footer>
       <p className="text-center my-4">
@@ -144,6 +299,9 @@ function UnAuthenticatedFooter() {
         </Link>{" "}
         to add comments to this article.
       </p>
+      <div className="mx-auto w-1/2 my-8">
+        <Comments slug={props.slug} />
+      </div>
     </footer>
   );
 }

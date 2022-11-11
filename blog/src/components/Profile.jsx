@@ -43,12 +43,12 @@ class Profile extends React.Component {
       });
   };
   render() {
-    console.log(this.props.match.params.username);
     return (
       <>
         <ProfileData
           username={this.props.match.params.username}
           user={this.props.user}
+          handleFollow={this.props.handleFollow}
         />
         s
         <div className="container-md my-10">
@@ -125,7 +125,10 @@ class ProfileData extends React.Component {
           {username === this.props.user.username ? (
             <SettingsButton />
           ) : (
-            <FollowButton username={username} />
+            <FollowButton
+              username={username}
+              handleFollow={this.props.handleFollow}
+            />
           )}
         </div>
       </div>
@@ -154,6 +157,7 @@ function FollowButton(props) {
              border-gray-500 text-gray-500 rounded-md
               my-2 ml-auto mr-0  block hover:bg-amber-300
                hover:text-white"
+      onClick={() => props.handleFollow("POST", props.username)}
     >
       {`+ Follow ${props.username}`}
     </button>

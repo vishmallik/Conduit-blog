@@ -22,6 +22,9 @@
   .border-1 {
     border-width: 1px;
   }
+  .border-t-1 {
+    border-top-width: 1px;
+  }
   .font-0 {
     font-size: 0;
   }
