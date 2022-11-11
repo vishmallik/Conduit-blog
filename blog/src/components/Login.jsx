@@ -49,10 +49,7 @@ class Login extends React.Component {
         return res.json();
       })
       .then(({ user }) => {
-        console.log(user);
-
         this.props.updateUser(user);
-        // this.setState({ email: "", password: "" });
         this.props.history.push("/");
       })
       .catch((errors) =>

@@ -8,7 +8,7 @@ export default function Post(props) {
     rounded-md overflow-hidden"
     >
       <div className="flex items-center">
-        <Link to={`/@${author.username}`}>
+        <Link to={`/profile/@${author.username}`}>
           <img
             src={author.image || "/images/smiley-cyrus.jpg"}
             alt={author.username}
@@ -17,7 +17,7 @@ export default function Post(props) {
         </Link>
 
         <div className="basis-11/12 pl-4">
-          <Link to={`/@${author.username}`}>
+          <Link to={`/profile/@${author.username}`}>
             <p className="text-red-600 hover:underline">{author.username}</p>
           </Link>
           <p className="text-gray-400 text-xs">

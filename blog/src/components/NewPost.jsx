@@ -21,7 +21,7 @@ class NewPost extends React.Component {
   handleChange = ({ target }) => {
     let { name, value } = target;
     if (name === "tagList") {
-      value = value.split(",");
+      value = value.split(",").map((tag) => tag.trim());
     }
 
     this.setState({
@@ -77,7 +77,6 @@ class NewPost extends React.Component {
       body: JSON.stringify(data),
     })
       .then((res) => {
-        console.log(res);
         if (!res.ok) {
           return res.json().then(({ errors }) => Promise.reject(errors));
         }
@@ -162,7 +161,7 @@ class NewPost extends React.Component {
           value="Publish Article"
           className="bg-amber-500 mr-0 ml-auto px-6 py-2 mt-4 text-white
       rounded-md text-lg cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 "
-          // disabled={!title || !description || !body || !tagList}
+          disabled={!title || !description || !body || !tagList}
         />
       </form>
     );

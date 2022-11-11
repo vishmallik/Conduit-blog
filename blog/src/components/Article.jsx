@@ -1,9 +1,11 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, withRouter } from "react-router-dom";
 import { articlesURL } from "../utils/urls";
 import Loader from "./Loader";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
-export default class Article extends React.Component {
+class Article extends React.Component {
   state = {
     article: null,
     error: null,
@@ -68,7 +70,10 @@ export default class Article extends React.Component {
         </div>
         <div className="container-md ">
           <p className="whitespace-pre-line text-lg text-justify py-6">
-            {article.body}
+            <ReactMarkdown
+              children={article.body}
+              remarkPlugins={[remarkGfm]}
+            />
           </p>
           <ul>
             {article.tagList.map((tag) => {
@@ -85,19 +90,62 @@ export default class Article extends React.Component {
             })}
           </ul>
           <hr className="my-4" />
-          <p className="text-center my-4">
-            <Link className="text-amber-500" to="/login">
-              Sign in
-            </Link>{" "}
-            or
-            <Link className="text-amber-500" to="/register">
-              {" "}
-              Sign Up
-            </Link>{" "}
-            to add comments to this article.
-          </p>
+          {this.props.user ? (
+            <AuthenticatedFooter user={this.props.user} />
+          ) : (
+            <UnAuthenticatedFooter />
+          )}
         </div>
       </>
     );
   }
 }
+
+function AuthenticatedFooter(props) {
+  return (
+    <footer>
+      <form action="" className="mx-auto w-1/2 font-0 my-4">
+        <textarea
+          name=""
+          id=""
+          rows="5"
+          placeholder="Write a comment"
+          className="w-full border-1 border-solid border-grey-200 rounded-t-md  mb-0 p-4 text-base focus:outline-0"
+        ></textarea>
+        <div className="border-1 border-solid border-grey-200 rounded-b-md mt-0 py-2 text-base flex justify-between items-center px-2 bg-gray-200">
+          <img
+            src={props.user.image}
+            alt={props.user.username}
+            className="w-8 h-8 rounded-full"
+          />
+          <input
+            type="submit"
+            value="Post Comment"
+            className="bg-amber-500 text-white 
+          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
+          />
+        </div>
+      </form>
+    </footer>
+  );
+}
+
+function UnAuthenticatedFooter() {
+  return (
+    <footer>
+      <p className="text-center my-4">
+        <Link className="text-amber-500" to="/login">
+          Sign in
+        </Link>{" "}
+        or
+        <Link className="text-amber-500" to="/register">
+          {" "}
+          Sign Up
+        </Link>{" "}
+        to add comments to this article.
+      </p>
+    </footer>
+  );
+}
+
+export default withRouter(Article);

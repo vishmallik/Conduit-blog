@@ -22,4 +22,7 @@
   .border-1 {
     border-width: 1px;
   }
+  .font-0 {
+    font-size: 0;
+  }
 }

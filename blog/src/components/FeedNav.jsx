@@ -46,6 +46,7 @@ export default function FeedNav(props) {
           #{props.activeTab}
         </Link>
       )}
+
       <hr />
     </>
   );

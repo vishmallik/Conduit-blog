@@ -11,7 +11,6 @@ import LoaderFull from "./Loader Full";
 import NewPost from "./NewPost";
 import Setting from "./Setting";
 import Profile from "./Profile";
-import User from "./User";
 
 export default class App extends React.Component {
   state = {
@@ -94,11 +93,12 @@ function AuthenticatedApp(props) {
           updateIsLoggedIn={props.updateIsLoggedIn}
         />
       </Route>
-      <Route path="/@:username" component={User} />
-      <Route path="/profile">
-        <Profile />
+      <Route path="/profile/@:username">
+        <Profile user={props.user} />
       </Route>
-      <Route path="/article/:slug" exact component={Article} />
+      <Route path="/article/:slug" exact>
+        <Article user={props.user} />
+      </Route>
       <Route path="*">
         <Error />
       </Route>
@@ -112,7 +112,9 @@ function UnAuthenticatedApp(props) {
       <Route path="/" exact>
         <Home user={props.isLoggedIn} />
       </Route>
-      <Route path="/article/:slug" exact component={Article} />
+      <Route path="/article/:slug" exact>
+        <Article user={props.user} />
+      </Route>
       <Route path="/register">
         <Register updateUser={props.updateUser} />
       </Route>

@@ -15,13 +15,9 @@ export default class Home extends React.Component {
     activeTab: this.props.isLoggedIn ? "Your Feed" : "",
   };
   componentDidMount() {
-    console.log("cDM.home", this.props);
-
     this.fetchData();
   }
   componentDidUpdate(prevProps, prevState) {
-    console.log("cDU.home");
-
     if (
       prevState.currentPageIndex !== this.state.currentPageIndex ||
       prevState.activeTab !== this.state.activeTab

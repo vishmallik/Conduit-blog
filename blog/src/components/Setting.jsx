@@ -37,16 +37,24 @@ class Setting extends React.Component {
   };
   onSubmit = (event) => {
     event.preventDefault();
+
     let { image, username, bio, email, password } = this.state;
     let data = {
       user: {
-        image,
-        username,
-        bio,
-        email,
-        password,
+        image: image,
+        username: username,
+        bio: bio,
+        email: email,
+        password: password,
       },
     };
+
+    Object.keys(data.user).forEach((key) => {
+      if (data.user[key] === "") {
+        delete data.user[key];
+      }
+    });
+
     fetch(verifyURL, {
       method: "PUT",
       headers: {
@@ -62,7 +70,6 @@ class Setting extends React.Component {
         return res.json();
       })
       .then(({ user }) => {
-        console.log(user);
         this.props.updateUser(user);
         // this.props.history.push("/");
       })
