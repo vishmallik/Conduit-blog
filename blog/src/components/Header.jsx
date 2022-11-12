@@ -23,7 +23,7 @@ export default class Header extends React.Component {
           </Link>
           <nav>
             <i
-              className={`fas fa-bars text-white hover:text-red-400 text-xl sm:hidden cursor-pointer ${
+              className={`fas fa-bars text-white hover:text-red-400 text-xl lg:hidden cursor-pointer ${
                 menu ? "hidden" : ""
               }`}
               onClick={this.handleMenuUpdate}
@@ -93,7 +93,7 @@ function NoAuthHeader(props) {
 function AuthHeader(props) {
   return (
     <ul
-      className={`sm:flex text-lg  ${
+      className={`lg:flex text-lg  ${
         props.menu
           ? "flex flex-col fixed top-0 left-0 right-0 text-center bottom-0 min-h-full bg-amber-400 text-2xl overflow-hidden pt-16 z-10"
           : "hidden"

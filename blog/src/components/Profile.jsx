@@ -9,7 +9,7 @@ class Profile extends React.Component {
   state = {
     activeTab: "author",
     articles: [],
-    // currentProfile: this.props.match.params.username,
+    errors: "",
   };
   updateActiveTab = (tab) => {
     this.setState(
@@ -40,7 +40,10 @@ class Profile extends React.Component {
       })
       .then(({ articles }) => {
         this.setState({ articles });
-      });
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to fetch Article!!!" })
+      );
   };
   render() {
     return (
@@ -51,7 +54,7 @@ class Profile extends React.Component {
           handleFollow={this.props.handleFollow}
         />
 
-        <div className="sm:container-md sm:my-10 my-4 container-mobile sm:text-left">
+        <div className="sm:container-md sm:my-10 my-4 container-mobile sm:text-left min-h-screen">
           <span
             className={`px-1 mr-2 hover:cursor-pointer  ${
               this.state.activeTab === "author"
@@ -72,9 +75,19 @@ class Profile extends React.Component {
           >
             Favorited Articles
           </span>
-          <div>
-            <Posts articles={this.state.articles} />
-          </div>
+          {this.state.errors ? (
+            <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+              {this.state.errors}
+            </p>
+          ) : (
+            <div>
+              <Posts
+                articles={this.state.articles}
+                handleFavorite={this.props.handleFavorite}
+                isLoggedIn={this.props.isLoggedIn}
+              />
+            </div>
+          )}
         </div>
       </>
     );
@@ -105,10 +118,19 @@ class ProfileData extends React.Component {
         return res.json();
       })
       .then(({ profile }) => this.setState({ profile }))
-      .catch((errors) => this.setState({ errors }));
+      .catch((errors) => {
+        this.setState({ errors: "Unable to fetch Profile" });
+      });
   };
   render() {
     let { image, username, bio } = this.state.profile;
+    if (this.state.errors) {
+      return (
+        <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+          {this.state.errors}
+        </p>
+      );
+    }
     if (!this.state.profile) {
       return <Loader />;
     }

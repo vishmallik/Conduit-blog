@@ -21,27 +21,31 @@ export default class SideBar extends React.Component {
         });
       })
       .catch((err) => {
-        this.setState({ error: "Unable to fetch tags" });
+        this.setState({ error: "Unable to fetch tags!!!" });
       });
   }
   render() {
     let { tags, error } = this.state;
     if (error) {
-      return <p>{error}</p>;
+      return (
+        <p className="text-red-500 text-center mx-auto text-2xl py-8">
+          {error}
+        </p>
+      );
     }
     if (!tags) {
       return <Loader />;
     }
     return (
-      <aside className="sm:basis-1/4 basis-full">
-        <ul className="bg-red-300 m-6 p-2 rounded-md">
+      <aside className="xl:basis-1/4 basis-full">
+        <ul className="bg-teal-100 m-6 p-2 rounded-md">
           <p className="p-2 text'lg">Popular Tags</p>
           {tags.map((tag) => {
             return tag ? (
               <li
                 className="inline-block border-2 border-solid
-                 border-red-400 px-2 m-1/2 text-xs rounded-lg 
-                 cursor-pointer hover:bg-amber-300"
+                 border-violet-400 px-2 m-1/2 text-xs rounded-lg 
+                 cursor-pointer  hover:bg-violet-400"
                 key={tag}
                 onClick={() => this.props.updateActiveTab(tag)}
               >

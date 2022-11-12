@@ -54,7 +54,7 @@ export default class Home extends React.Component {
         });
       })
       .catch((err) => {
-        this.setState({ error: "Unable to fetch data" });
+        this.setState({ error: "Unable to fetch data!!!" });
       });
   };
   updatePageIndex = (index) => {
@@ -83,7 +83,7 @@ export default class Home extends React.Component {
           <p className="text-xl">A place to share your knowledge</p>
         </div>
         <div className="sm:flex flex-wrap">
-          <div className="sm:basis-3/4 basis-full">
+          <div className="xl:basis-3/4 basis-full">
             <FeedNav
               activeTab={activeTab}
               updateActiveTab={this.updateActiveTab}
@@ -95,6 +95,7 @@ export default class Home extends React.Component {
               handleFollow={this.props.handleFollow}
               handleFavorite={this.props.handleFavorite}
               isLoggedIn={this.props.isLoggedIn}
+              updateActiveTab={this.updateActiveTab}
             />
             <Pagination
               articlesCount={articlesCount}

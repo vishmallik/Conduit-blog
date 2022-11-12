@@ -13,6 +13,7 @@ class NewPost extends React.Component {
       description: "",
       body: "",
       tagList: "",
+      common: "",
     },
   };
   componentDidMount() {
@@ -99,11 +100,19 @@ class NewPost extends React.Component {
             description: "",
             body: "",
             tagList: "",
+            common: "",
           },
         });
         this.props.history.push(`/article/${article.slug}`);
       })
-      .catch((errors) => console.log(errors));
+      .catch((errors) =>
+        this.setState({
+          errors: {
+            ...errors,
+            common: "Unable to Create New Article!!!",
+          },
+        })
+      );
   };
   handleEdit = (event) => {
     event.preventDefault();
@@ -137,16 +146,36 @@ class NewPost extends React.Component {
         return res.json();
       })
       .then(({ article }) => {
+        this.setState({
+          errors: {
+            title: "",
+            description: "",
+            body: "",
+            tagList: "",
+            common: "",
+          },
+        });
         this.props.history.push(`/article/${article.slug}`);
       })
-      .catch((errors) => console.log(errors));
+      .catch((errors) =>
+        this.setState({
+          errors: { ...errors, common: "Unable to Edit Article!!!" },
+        })
+      );
   };
   render() {
     let { title, description, body, tagList, errors } = this.state;
+    if (errors.common) {
+      return (
+        <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+          {errors.common}
+        </p>
+      );
+    }
     return (
       <form
         action=""
-        className="sm:container-md flex flex-col sm:w-1/2 container-mobile w-full"
+        className="sm:container-md flex flex-col sm:w-1/2 container-mobile w-full pt-4 pb-20"
         onSubmit={
           this.props.location.state ? this.handleEdit : this.handleSubmit
         }

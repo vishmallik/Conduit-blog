@@ -1,8 +1,8 @@
 import React from "react";
 import Loader from "./Loader";
 
-export default function Comments() {
-  let { comments, handleDeleteComment } = this.props;
+export default function Comments(props) {
+  let { comments, handleDeleteComment } = props;
   if (!comments) {
     return <Loader />;
   } else {
@@ -33,8 +33,7 @@ export default function Comments() {
                   {new Date(comment.createdAt).toDateString()}
                 </span>
               </div>
-              {this.props.user &&
-              this.props.user.username === comment.author.username ? (
+              {props.user && props.user.username === comment.author.username ? (
                 <i
                   className="fa-solid fa-trash text-gray-400 cursor-pointer
                    text-sm hover:text-red-500 "
