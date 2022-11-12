@@ -16,12 +16,14 @@ import LoaderFull from "./Loader Full";
 import NewPost from "./NewPost";
 import Setting from "./Setting";
 import Profile from "./Profile";
+import Footer from "./Footer";
 
 export default class App extends React.Component {
   state = {
     isLoggedIn: false,
     user: null,
     isVerifying: true,
+    errors: "",
   };
   updateUser = (user) => {
     this.setState({
@@ -49,7 +51,9 @@ export default class App extends React.Component {
         }
         return res.json();
       })
-      .then(({ profile }) => console.log(profile));
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete follow request" })
+      );
   };
   handleFavorite = (verb, slug) => {
     fetch(articlesURL + `/${slug}/favorite`, {
@@ -64,7 +68,9 @@ export default class App extends React.Component {
         }
         return res.json();
       })
-      .then(({ article }) => console.log(article));
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete favorite request" })
+      );
   };
 
   componentDidMount = () => {
@@ -81,7 +87,7 @@ export default class App extends React.Component {
         })
         .then(({ user }) => this.updateUser(user))
         .catch((error) => {
-          console.log(error);
+          this.setState({ errors: "Can't Verify User" });
         });
     } else {
       this.setState({ isVerifying: false });
@@ -94,7 +100,11 @@ export default class App extends React.Component {
     return (
       <BrowserRouter>
         <Header isLoggedIn={this.state.isLoggedIn} user={this.state.user} />
-        {this.state.isLoggedIn ? (
+        {this.state.errors ? (
+          <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+            {this.state.errors}
+          </p>
+        ) : this.state.isLoggedIn ? (
           <AuthenticatedApp
             isLoggedIn={this.state.isLoggedIn}
             user={this.state.user}
@@ -109,6 +119,7 @@ export default class App extends React.Component {
             isLoggedIn={this.state.isLoggedIn}
           />
         )}
+        <Footer />
       </BrowserRouter>
     );
   }
@@ -135,7 +146,12 @@ function AuthenticatedApp(props) {
         />
       </Route>
       <Route path="/profile/@:username">
-        <Profile user={props.user} handleFollow={props.handleFollow} />
+        <Profile
+          user={props.user}
+          handleFavorite={props.handleFavorite}
+          isLoggedIn={props.isLoggedIn}
+          handleFollow={props.handleFollow}
+        />
       </Route>
       <Route path="/article/:slug" exact>
         <Article

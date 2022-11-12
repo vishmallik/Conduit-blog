@@ -3,6 +3,8 @@ import { Link, withRouter } from "react-router-dom";
 import { articlesURL } from "../utils/urls";
 import Loader from "./Loader";
 import Comments from "./Comments";
+import remarkGfm from "remark-gfm";
+import ReactMarkdown from "react-markdown";
 
 class Article extends React.Component {
   state = {
@@ -24,7 +26,7 @@ class Article extends React.Component {
         });
       })
       .catch((err) => {
-        this.setState({ error: "Unable to fetch article" });
+        this.setState({ error: "Unable to fetch article!!!" });
       });
   }
   handleDelete = () => {
@@ -42,25 +44,30 @@ class Article extends React.Component {
       })
 
       .catch((err) => {
-        this.setState({ error: "Unable to delete article" });
+        this.setState({ error: "Unable to delete article!!!" });
       });
   };
 
   render() {
     let { article, error } = this.state;
+
     if (error) {
-      return <p>{error}</p>;
+      return (
+        <p className="min-h-screen text-center py-10 text-3xl text-red-500">
+          {error}
+        </p>
+      );
     }
     if (!article) {
       return (
-        <div className="w-3/4 mx-auto">
+        <div className="w-3/4 mx-auto min-h-screen">
           <Loader />
         </div>
       );
     }
     return (
-      <>
-        <div className="bg-zinc-600">
+      <section className="min-h-screen">
+        <div className="bg-zinc-600 ">
           <div className="container-md py-10">
             <h2 className="text-white text-4xl font-semibold py-4 mb-4">
               {article.title}
@@ -103,13 +110,12 @@ class Article extends React.Component {
           </div>
         </div>
         <div className="sm:container-md container-mobile ">
-          <p className="whitespace-pre-line text-lg text-justify py-6 break-words">
-            {/* <ReactMarkdown
-              children=
+          <span className="whitespace-pre-line text-lg text-justify py-6 break-words">
+            <ReactMarkdown
+              children={article.body}
               remarkPlugins={[remarkGfm]}
-            /> */}
-            {article.body}
-          </p>
+            />
+          </span>
           <ul>
             {article.tagList.map((tag) => {
               return (
@@ -131,7 +137,7 @@ class Article extends React.Component {
             <UnAuthenticatedFooter user={this.props.user} slug={article.slug} />
           )}
         </div>
-      </>
+      </section>
     );
   }
 }
@@ -166,11 +172,11 @@ function OtherUserButtons(props) {
           Follow {props.article.author.username}
         </button>
       )}
+
       <button
-        className="px-2 py-1 border-1 border-solid
-        border-teal-500 text-teal-500 rounded-md
-           block hover:bg-teal-500 text-sm font-bold
-          hover:text-white w-full sm:w-auto"
+        className={`px-2 py-1 border-1 border-solid border-teal-500
+         text-teal-500 rounded-md block hover:bg-teal-500
+          text-sm font-bold hover:text-white w-full sm:w-auto `}
         onClick={() => props.handleFavorite("POST", props.article.slug)}
       >
         <i className="fas fa-heart pr-2"></i>
@@ -253,7 +259,6 @@ class AuthenticatedFooter extends React.Component {
   handleSubmit = (event) => {
     event.preventDefault();
     let body = { comment: { body: this.state.comment } };
-    console.log(this);
     this.fetchData("POST", "", true, body)
       .then(({ comment }) => {
         this.setState({ comment: "" });
@@ -286,7 +291,7 @@ class AuthenticatedFooter extends React.Component {
       <footer>
         <form
           action=""
-          className="mx-auto sm:w-1/2 font-0 my-4 w-full"
+          className="mx-auto 2xl:w-1/2 font-0 my-4 w-full "
           onSubmit={this.handleSubmit}
         >
           <textarea

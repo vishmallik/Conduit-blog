@@ -16,7 +16,9 @@ class Setting extends React.Component {
       bio: "",
       email: "",
       password: "",
+      common: "",
     },
+    success: "",
   };
   componentDidMount() {
     this.setState({
@@ -71,7 +73,9 @@ class Setting extends React.Component {
       })
       .then(({ user }) => {
         this.props.updateUser(user);
-        // this.props.history.push("/");
+        this.setState((prevState) => {
+          return { ...prevState, success: "Data Updated Successfully!!!" };
+        });
       })
       .catch((errors) =>
         this.setState((prevState) => {
@@ -79,7 +83,7 @@ class Setting extends React.Component {
             ...prevState,
             errors: {
               ...prevState.errors,
-              email: "Email/Password is Incorrect",
+              common: "Unable to update settings!!!",
             },
           };
         })
@@ -98,6 +102,20 @@ class Setting extends React.Component {
           <label htmlFor="" className="text-3xl py-2 font-bold mx-auto">
             Your Settings
           </label>
+          {this.state.errors.common ? (
+            <p className="text-red-500 font-bold text-center">
+              {this.state.errors.common}
+            </p>
+          ) : (
+            ""
+          )}
+          {this.state.success ? (
+            <p className="text-green-500 font-bold text-center">
+              {this.state.success}
+            </p>
+          ) : (
+            ""
+          )}
           <input
             type="text"
             name="image"
