@@ -2,8 +2,7 @@ import React from "react";
 import { Link, withRouter } from "react-router-dom";
 import { articlesURL } from "../utils/urls";
 import Loader from "./Loader";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import Comments from "./Comments";
 
 class Article extends React.Component {
   state = {
@@ -28,6 +27,25 @@ class Article extends React.Component {
         this.setState({ error: "Unable to fetch article" });
       });
   }
+  handleDelete = () => {
+    fetch(articlesURL + `/${this.state.article.slug}`, {
+      method: "DELETE",
+      headers: {
+        authorization: `Token ${this.props.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error(res.statusText);
+        }
+        this.props.history.push("/");
+      })
+
+      .catch((err) => {
+        this.setState({ error: "Unable to delete article" });
+      });
+  };
+
   render() {
     let { article, error } = this.state;
     if (error) {
@@ -47,15 +65,15 @@ class Article extends React.Component {
             <h2 className="text-white text-4xl font-semibold py-4 mb-4">
               {article.title}
             </h2>
-            <div className="flex items-center">
-              <Link to="/">
+            <div className="flex flex-wrap  items-center">
+              <Link to="/" className="mb-6 sm:mb-0">
                 <img
                   src={article.author.image || "/images/smiley-cyrus.jpg"}
                   alt={article.author.username}
                   className="w-10 h-10 rounded-full mr-4"
                 />
               </Link>
-              <div>
+              <div className="mr-10 mb-6 sm:mb-0">
                 <Link to="/">
                   <p className="text-amber-500 hover:underline">
                     {article.author.username}
@@ -65,15 +83,32 @@ class Article extends React.Component {
                   {new Date(article.createdAt).toDateString()}
                 </p>
               </div>
+              {this.props.user ? (
+                article.author.username === this.props.user.username ? (
+                  <UserButtons
+                    handleDelete={this.handleDelete}
+                    article={article}
+                  />
+                ) : (
+                  <OtherUserButtons
+                    handleFollow={this.props.handleFollow}
+                    article={article}
+                    handleFavorite={this.props.handleFavorite}
+                  />
+                )
+              ) : (
+                ""
+              )}
             </div>
           </div>
         </div>
-        <div className="container-md ">
-          <p className="whitespace-pre-line text-lg text-justify py-6">
-            <ReactMarkdown
-              children={article.body}
+        <div className="sm:container-md container-mobile ">
+          <p className="whitespace-pre-line text-lg text-justify py-6 break-words">
+            {/* <ReactMarkdown
+              children=
               remarkPlugins={[remarkGfm]}
-            />
+            /> */}
+            {article.body}
           </p>
           <ul>
             {article.tagList.map((tag) => {
@@ -90,10 +125,10 @@ class Article extends React.Component {
             })}
           </ul>
           <hr className="my-4" />
-          {this.props.user ? (
-            <AuthenticatedFooter user={this.props.user} />
+          {this.props.isLoggedIn ? (
+            <AuthenticatedFooter user={this.props.user} slug={article.slug} />
           ) : (
-            <UnAuthenticatedFooter />
+            <UnAuthenticatedFooter user={this.props.user} slug={article.slug} />
           )}
         </div>
       </>
@@ -101,36 +136,203 @@ class Article extends React.Component {
   }
 }
 
-function AuthenticatedFooter(props) {
+function OtherUserButtons(props) {
   return (
-    <footer>
-      <form action="" className="mx-auto w-1/2 font-0 my-4">
-        <textarea
-          name=""
-          id=""
-          rows="5"
-          placeholder="Write a comment"
-          className="w-full border-1 border-solid border-grey-200 rounded-t-md  mb-0 p-4 text-base focus:outline-0"
-        ></textarea>
-        <div className="border-1 border-solid border-grey-200 rounded-b-md mt-0 py-2 text-base flex justify-between items-center px-2 bg-gray-200">
-          <img
-            src={props.user.image}
-            alt={props.user.username}
-            className="w-8 h-8 rounded-full"
-          />
-          <input
-            type="submit"
-            value="Post Comment"
-            className="bg-amber-500 text-white 
-          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
-          />
-        </div>
-      </form>
-    </footer>
+    <>
+      {props.article.author.following ? (
+        <button
+          className="px-2 py-1 border-1 border-solid
+        border-green-500 text-green-500 rounded-md
+        mr-4 sm:block hover:bg-green-500 text-sm font-bold
+        hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+          onClick={() =>
+            props.handleFollow("DELETE", props.article.author.username)
+          }
+        >
+          <i className="fas fa-minus pr-2"></i>
+          UnFollow {props.article.author.username}
+        </button>
+      ) : (
+        <button
+          className="px-2 py-1 border-1 border-solid
+        border-green-500 text-green-500 rounded-md
+          sm:mr-4 block hover:bg-green-500 text-sm font-bold
+          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+          onClick={() =>
+            props.handleFollow("POST", props.article.author.username)
+          }
+        >
+          <i className="fas fa-plus pr-2"></i>
+          Follow {props.article.author.username}
+        </button>
+      )}
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-teal-500 text-teal-500 rounded-md
+           block hover:bg-teal-500 text-sm font-bold
+          hover:text-white w-full sm:w-auto"
+        onClick={() => props.handleFavorite("POST", props.article.slug)}
+      >
+        <i className="fas fa-heart pr-2"></i>
+        Favorite Post
+      </button>
+    </>
   );
 }
 
-function UnAuthenticatedFooter() {
+function UserButtons(props) {
+  return (
+    <>
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-cyan-500 text-cyan-500 rounded-md
+          sm:mr-4 block hover:bg-cyan-500 text-sm font-bold
+          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+      >
+        <Link to={{ pathname: "/editor", state: { article: props.article } }}>
+          <i className="fas fa-pen pr-2"></i>
+          Edit Article
+        </Link>
+      </button>
+      <button
+        className="px-2 py-1 border-1 border-solid
+        border-red-500 text-red-500 rounded-md
+           block hover:bg-red-500 text-sm font-bold
+          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+        onClick={props.handleDelete}
+      >
+        <i className="fas fa-trash pr-2"></i>
+        Delete Article
+      </button>
+    </>
+  );
+}
+
+class AuthenticatedFooter extends React.Component {
+  state = {
+    comment: "",
+    comments: "",
+    errors: {
+      comment: "",
+      comments: "",
+    },
+  };
+  handleChange = ({ target }) => {
+    let { value } = target;
+    this.setState({
+      comment: value,
+    });
+  };
+  componentDidMount() {
+    this.fetchData("GET", "")
+      .then(({ comments }) => {
+        this.setState({ comments });
+      })
+      .catch((errors) =>
+        this.setState({ errors: { comments: "Couldn't Fetch comments" } })
+      );
+  }
+
+  fetchData = (verb, id, headers, body) => {
+    return fetch(articlesURL + `/${this.props.slug}/comments/${id}`, {
+      method: verb,
+      headers: headers
+        ? {
+            authorization: `Token ${this.props.user.token}`,
+            "Content-Type": "application/json",
+          }
+        : {},
+      body: JSON.stringify(body),
+    }).then((res) => {
+      if (!res.ok) {
+        return res.json().then(({ errors }) => Promise.reject(errors));
+      }
+      return res.json();
+    });
+  };
+  handleSubmit = (event) => {
+    event.preventDefault();
+    let body = { comment: { body: this.state.comment } };
+    console.log(this);
+    this.fetchData("POST", "", true, body)
+      .then(({ comment }) => {
+        this.setState({ comment: "" });
+        this.fetchData("GET", "")
+          .then(({ comments }) => {
+            this.setState({ comments });
+          })
+          .catch((errors) =>
+            this.setState({ errors: { comments: "Couldn't Fetch comments" } })
+          );
+      })
+      .catch((errors) =>
+        this.setState({ errors: { comment: "Couldn't Post comment" } })
+      );
+  };
+  handleDeleteComment = async (id) => {
+    await this.fetchData("DELETE", id, true).catch((errors) =>
+      this.setState({ errors: { comments: "Couldn't Delete comments" } })
+    );
+    this.fetchData("GET", "")
+      .then(({ comments }) => {
+        this.setState({ comments });
+      })
+      .catch((errors) =>
+        this.setState({ errors: { comments: "Couldn't Fetch comments" } })
+      );
+  };
+  render() {
+    return (
+      <footer>
+        <form
+          action=""
+          className="mx-auto sm:w-1/2 font-0 my-4 w-full"
+          onSubmit={this.handleSubmit}
+        >
+          <textarea
+            id=""
+            value={this.state.comment}
+            rows="5"
+            name="comment"
+            placeholder="Write a comment"
+            onChange={this.handleChange}
+            className="w-full border-1 border-solid border-grey-200
+           rounded-t-md  mb-0 p-4 text-base focus:outline-0"
+          ></textarea>
+          <div
+            className="border-1 border-solid border-grey-200
+         rounded-b-md mt-0 py-2 text-base flex justify-between
+          items-center px-2 bg-gray-200"
+          >
+            <img
+              src={this.props.user.image || "images/smiley-cyrus.jpg"}
+              alt={this.props.user.username}
+              className="w-8 h-8 rounded-full"
+            />
+            <input
+              type="submit"
+              value="Post Comment"
+              className="bg-amber-500 text-white 
+          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
+            />
+          </div>
+        </form>
+
+        {/* View all comments */}
+        <div className="mx-auto sm:w-1/2 w-full my-4">
+          <Comments
+            slug={this.props.slug}
+            user={this.props.user}
+            comments={this.state.comments}
+            handleDeleteComment={this.handleDeleteComment}
+          />
+        </div>
+      </footer>
+    );
+  }
+}
+
+function UnAuthenticatedFooter(props) {
   return (
     <footer>
       <p className="text-center my-4">
@@ -144,6 +346,9 @@ function UnAuthenticatedFooter() {
         </Link>{" "}
         to add comments to this article.
       </p>
+      <div className="mx-auto sm:w-1/2 w-full my-4">
+        <Comments slug={props.slug} />
+      </div>
     </footer>
   );
 }

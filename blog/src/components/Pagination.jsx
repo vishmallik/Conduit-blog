@@ -7,7 +7,7 @@ export default function Pagination(props) {
     pageArray.push(i);
   }
   return (
-    <ul className="flex flex-wrap p-6 justify-start ">
+    <ul className="flex flex-wrap p-6 justify-center">
       <li
         className={`w-20 h-10 cursor-pointer flex 
         justify-center items-center m-1 border-2 

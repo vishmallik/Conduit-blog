@@ -6,7 +6,12 @@ import Header from "./Header";
 import Home from "./Home";
 import Login from "./Login";
 import Register from "./Register";
-import { localStorageKey, verifyURL } from "../utils/urls";
+import {
+  articlesURL,
+  localStorageKey,
+  profileURL,
+  verifyURL,
+} from "../utils/urls";
 import LoaderFull from "./Loader Full";
 import NewPost from "./NewPost";
 import Setting from "./Setting";
@@ -30,6 +35,36 @@ export default class App extends React.Component {
     this.setState({
       isLoggedIn: false,
     });
+  };
+  handleFollow = (verb, username) => {
+    fetch(profileURL + `/${username}/follow`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.state.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        return res.json();
+      })
+      .then(({ profile }) => console.log(profile));
+  };
+  handleFavorite = (verb, slug) => {
+    fetch(articlesURL + `/${slug}/favorite`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.state.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        return res.json();
+      })
+      .then(({ article }) => console.log(article));
   };
 
   componentDidMount = () => {
@@ -65,6 +100,8 @@ export default class App extends React.Component {
             user={this.state.user}
             updateUser={this.updateUser}
             updateIsLoggedIn={this.updateIsLoggedIn}
+            handleFollow={this.handleFollow}
+            handleFavorite={this.handleFavorite}
           />
         ) : (
           <UnAuthenticatedApp
@@ -81,7 +118,11 @@ function AuthenticatedApp(props) {
   return (
     <Switch>
       <Route path="/" exact>
-        <Home isLoggedIn={props.isLoggedIn} user={props.user} />
+        <Home
+          isLoggedIn={props.isLoggedIn}
+          user={props.user}
+          handleFavorite={props.handleFavorite}
+        />
       </Route>
       <Route path="/editor">
         <NewPost user={props.user} />
@@ -94,10 +135,15 @@ function AuthenticatedApp(props) {
         />
       </Route>
       <Route path="/profile/@:username">
-        <Profile user={props.user} />
+        <Profile user={props.user} handleFollow={props.handleFollow} />
       </Route>
       <Route path="/article/:slug" exact>
-        <Article user={props.user} />
+        <Article
+          user={props.user}
+          isLoggedIn={props.isLoggedIn}
+          handleFollow={props.handleFollow}
+          handleFavorite={props.handleFavorite}
+        />
       </Route>
       <Route path="*">
         <Error />

@@ -33,7 +33,7 @@ export default class SideBar extends React.Component {
       return <Loader />;
     }
     return (
-      <aside className="basis-1/4">
+      <aside className="sm:basis-1/4 basis-full">
         <ul className="bg-red-300 m-6 p-2 rounded-md">
           <p className="p-2 text'lg">Popular Tags</p>
           {tags.map((tag) => {

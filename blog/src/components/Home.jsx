@@ -77,19 +77,25 @@ export default class Home extends React.Component {
       activeTab,
     } = this.state;
     return (
-      <main className="container-md">
+      <main className="sm:container-md container-mobile sm:mx-auto mx-auto">
         <div className="py-6 mx-auto text-center">
           <h1 className="text-amber-400 font-black text-5xl py-4">Conduit</h1>
           <p className="text-xl">A place to share your knowledge</p>
         </div>
-        <div className="flex">
-          <div className="basis-3/4 w-3/4">
+        <div className="sm:flex flex-wrap">
+          <div className="sm:basis-3/4 basis-full">
             <FeedNav
               activeTab={activeTab}
               updateActiveTab={this.updateActiveTab}
               isLoggedIn={this.props.isLoggedIn}
             />
-            <Posts articles={articles} error={error} />
+            <Posts
+              articles={articles}
+              error={error}
+              handleFollow={this.props.handleFollow}
+              handleFavorite={this.props.handleFavorite}
+              isLoggedIn={this.props.isLoggedIn}
+            />
             <Pagination
               articlesCount={articlesCount}
               articlesPerPage={articlesPerPage}

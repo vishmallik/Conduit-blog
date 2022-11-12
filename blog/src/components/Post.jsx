@@ -1,7 +1,16 @@
 import { Link } from "react-router-dom";
 
 export default function Post(props) {
-  let { author, createdAt, description, tagList, title, slug } = props.article;
+  let {
+    author,
+    createdAt,
+    description,
+    tagList,
+    title,
+    slug,
+    favoritesCount,
+    favorited,
+  } = props.article;
   return (
     <article
       className="my-6 bg-amber-200 p-4 
@@ -24,23 +33,37 @@ export default function Post(props) {
             {new Date(createdAt).toDateString()}
           </p>
         </div>
-        <button
-          className=" basis-12 py-1 rounded-md border-2
-         border-amber-400"
-        >
-          <i className="fas fa-heart"></i>1
-        </button>
+        {props.isLoggedIn ? (
+          <button
+            className={` basis-12 py-1 rounded-md border-2
+         border-amber-400 ${favorited && "bg-red-200"}`}
+            onClick={props.handleFavorite("POST", slug)}
+          >
+            <i className={`fas fa-heart ${favorited && "text-red-500"}`}></i>{" "}
+            {favoritesCount}
+          </button>
+        ) : (
+          <button
+            className={` basis-12 py-1 rounded-md border-2
+         border-amber-400 ${favorited && "bg-red-200"}`}
+          >
+            <Link to="/login">
+              <i className={`fas fa-heart ${favorited && "text-red-500"}`}></i>{" "}
+              {favoritesCount}
+            </Link>
+          </button>
+        )}
       </div>
       <Link to={`/article/${slug}`}>
         <h2 className="text-xl mt-4 font-bold">{title}</h2>
         <p className="text-slate-500">{description}</p>
       </Link>
 
-      <div className="flex justify-between my-2 mt-4">
+      <div className="flex flex-wrap justify-between my-2 mt-4 mx-2">
         <Link className="text-blue-600 hover:underline" to={`/article/${slug}`}>
           Read More...
         </Link>
-        <div>
+        <div className="flex flex-wrap py-2">
           {tagList.map((tag) => {
             return (
               <Link
