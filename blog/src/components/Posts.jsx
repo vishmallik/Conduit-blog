@@ -8,11 +8,7 @@ export default function Posts(props) {
     return <p>{error}</p>;
   }
   if (!articles) {
-    return (
-      <div className="w-3/4 mx-auto">
-        <Loader />
-      </div>
-    );
+    return <Loader />;
   }
   if (articles.length < 1) {
     return <h2 className="text-center font-2xl py-4">No articles found!!!</h2>;

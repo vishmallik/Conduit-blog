@@ -62,7 +62,7 @@ class Register extends React.Component {
   render() {
     let { username, password, email, empty } = this.state.errors;
     return (
-      <>
+      <div className="sm:container-md container-mobile">
         <h1
           className="text-center text-4xl font-semibold
          mt-6"
@@ -83,7 +83,7 @@ class Register extends React.Component {
             : ""}
         </span>
         <form
-          className="flex flex-col w-1/3 mx-auto"
+          className="flex flex-col sm:w-1/2 w-full mx-auto"
           onSubmit={this.handleSubmit}
         >
           <input
@@ -129,12 +129,12 @@ class Register extends React.Component {
             type="submit"
             value="Sign Up"
             disabled={empty || username || password || email}
-            className="bg-amber-400 px-4 py-2 rounded-md
-              w-1/4 ml-auto mr-0 my-4 text-lg text-white
-               hover:cursor-pointer disabled:bg-gray-400"
+            className="bg-amber-400 px-8 py-2 rounded-md
+              sm:ml-auto sm:mr-0 my-4 text-lg text-white
+               hover:cursor-pointer disabled:bg-gray-400 "
           />
         </form>
-      </>
+      </div>
     );
   }
 }

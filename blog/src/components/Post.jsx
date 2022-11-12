@@ -11,7 +11,6 @@ export default function Post(props) {
     favoritesCount,
     favorited,
   } = props.article;
-  console.log(author, "1");
   return (
     <article
       className="my-6 bg-amber-200 p-4 
@@ -60,11 +59,11 @@ export default function Post(props) {
         <p className="text-slate-500">{description}</p>
       </Link>
 
-      <div className="flex justify-between my-2 mt-4">
+      <div className="flex flex-wrap justify-between my-2 mt-4 mx-2">
         <Link className="text-blue-600 hover:underline" to={`/article/${slug}`}>
           Read More...
         </Link>
-        <div>
+        <div className="flex flex-wrap py-2">
           {tagList.map((tag) => {
             return (
               <Link

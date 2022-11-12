@@ -7,7 +7,7 @@ class NewPost extends React.Component {
     title: "",
     description: "",
     body: "",
-    tagList: null,
+    tagList: "",
     errors: {
       title: "",
       description: "",
@@ -15,9 +15,19 @@ class NewPost extends React.Component {
       tagList: "",
     },
   };
-  // componentDidUpdate(prevProps,prevState){
-  //   switch()
-  // }
+  componentDidMount() {
+    if (this.props.location.state) {
+      let { title, description, body, tagList } =
+        this.props.location.state.article;
+      this.setState({
+        ...this.state,
+        title,
+        description,
+        body,
+        tagList,
+      });
+    }
+  }
   handleChange = ({ target }) => {
     let { name, value } = target;
     if (name === "tagList") {
@@ -95,13 +105,51 @@ class NewPost extends React.Component {
       })
       .catch((errors) => console.log(errors));
   };
+  handleEdit = (event) => {
+    event.preventDefault();
+    let { title, description, body, tagList } = this.state;
+    let data = {
+      article: {
+        title,
+        description,
+        body,
+        tagList,
+      },
+    };
+    Object.keys(data.article).forEach((key) => {
+      if (data.article[key] === "") {
+        delete data.article[key];
+      }
+    });
+
+    fetch(articlesURL + `/${this.props.location.state.article.slug}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Token ${this.props.user.token}`,
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        return res.json();
+      })
+      .then(({ article }) => {
+        this.props.history.push(`/article/${article.slug}`);
+      })
+      .catch((errors) => console.log(errors));
+  };
   render() {
     let { title, description, body, tagList, errors } = this.state;
     return (
       <form
         action=""
-        className="container-md flex flex-col w-1/2"
-        onSubmit={this.handleSubmit}
+        className="sm:container-md flex flex-col sm:w-1/2 container-mobile w-full"
+        onSubmit={
+          this.props.location.state ? this.handleEdit : this.handleSubmit
+        }
       >
         <input
           type="text"
@@ -158,10 +206,11 @@ class NewPost extends React.Component {
 
         <input
           type="submit"
-          value="Publish Article"
-          className="bg-amber-500 mr-0 ml-auto px-6 py-2 mt-4 text-white
-      rounded-md text-lg cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 "
-          disabled={!title || !description || !body || !tagList}
+          value={
+            this.props.location.state ? "Update Article" : "Publish Article"
+          }
+          className="bg-amber-500 sm:mr-0 sm:ml-auto px-6 py-2 mt-4 text-white
+      rounded-md text-lg cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 sm:inline-block block"
         />
       </form>
     );

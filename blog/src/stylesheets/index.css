@@ -28,4 +28,9 @@
   .font-0 {
     font-size: 0;
   }
+  .container-mobile {
+    width: 100%;
+    margin: 0 auto;
+    max-width: 90%;
+  }
 }
