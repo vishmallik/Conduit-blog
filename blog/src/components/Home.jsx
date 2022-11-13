@@ -1,5 +1,4 @@
 import React from "react";
-import { articlesURL } from "../utils/urls";
 import FeedNav from "./FeedNav";
 import Pagination from "./Pagination";
 import Posts from "./Posts";
