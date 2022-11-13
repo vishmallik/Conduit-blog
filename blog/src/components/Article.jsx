@@ -9,52 +9,94 @@ import ReactMarkdown from "react-markdown";
 class Article extends React.Component {
   state = {
     article: null,
-    error: null,
+    comments: null,
+    errors: {
+      article: "",
+      comments: "",
+    },
   };
+
   componentDidMount() {
     let slug = this.props.match.params.slug;
-    fetch(articlesURL + `/${slug}`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
+    //fetch article
+    this.fetchData("GET", slug, false)
       .then((data) => {
         this.setState({
           article: data.article,
         });
       })
       .catch((err) => {
-        this.setState({ error: "Unable to fetch article!!!" });
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            article: "Unable to fetch article!!!",
+          },
+        });
       });
-  }
-  handleDelete = () => {
-    fetch(articlesURL + `/${this.state.article.slug}`, {
-      method: "DELETE",
-      headers: {
-        authorization: `Token ${this.props.user.token}`,
-      },
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        this.props.history.push("/");
-      })
 
+    //fetch comments
+    this.fetchAllComments(slug);
+  }
+  fetchAllComments = (slug) => {
+    this.fetchData("GET", slug, false, true, "")
+      .then(({ comments }) => {
+        this.setState({ comments });
+      })
+      .catch((errors) =>
+        this.setState({
+          errors: { ...this.state.errors, comments: "Couldn't Fetch comments" },
+        })
+      );
+  };
+  fetchData = (verb, slug, headers, comments, id, body) => {
+    return fetch(articlesURL + `/${slug}${comments ? `/comments/${id}` : ""}`, {
+      method: verb,
+      headers: headers
+        ? {
+            authorization: `Token ${this.props.user.token}`,
+            "Content-Type": "application/json",
+          }
+        : {},
+      body: JSON.stringify(body),
+    }).then((res) => {
+      if (!res.ok) {
+        return res.json().then(({ errors }) => Promise.reject(errors));
+      }
+      if (res.statusText === "No Content") {
+        return null;
+      }
+      return res.json();
+    });
+  };
+  handleDelete = () => {
+    let { slug } = this.state.article;
+    this.fetchData("DELETE", slug, true)
+      .then(this.props.history.push("/"))
       .catch((err) => {
-        this.setState({ error: "Unable to delete article!!!" });
+        this.setState({
+          errors: {
+            ...this.state.errors,
+            article: "Unable to delete article!!!",
+          },
+        });
+      });
+  };
+
+  handleDeleteComment = (id, slug) => {
+    this.fetchData("DELETE", slug, true, true, id)
+      .then((value) => (!value ? this.fetchAllComments(slug) : ""))
+      .catch((errors) => {
+        this.setState({ errors: { comments: "Couldn't Delete comments" } });
       });
   };
 
   render() {
-    let { article, error } = this.state;
+    let { article, comments, errors } = this.state;
 
-    if (error) {
+    if (errors.article) {
       return (
         <p className="min-h-screen text-center py-10 text-3xl text-red-500">
-          {error}
+          {errors.article}
         </p>
       );
     }
@@ -132,14 +174,144 @@ class Article extends React.Component {
           </ul>
           <hr className="my-4" />
           {this.props.isLoggedIn ? (
-            <AuthenticatedFooter user={this.props.user} slug={article.slug} />
+            <AuthenticatedFooter
+              user={this.props.user}
+              slug={article.slug}
+              comments={comments}
+              handleDeleteComment={this.handleDeleteComment}
+              fetchAllComments={this.fetchAllComments}
+              error={this.state.errors.comments}
+            />
           ) : (
-            <UnAuthenticatedFooter user={this.props.user} slug={article.slug} />
+            <UnAuthenticatedFooter
+              user={this.props.user}
+              slug={article.slug}
+              comments={comments}
+              error={this.state.errors.comments}
+            />
           )}
         </div>
       </section>
     );
   }
+}
+
+class AuthenticatedFooter extends React.Component {
+  state = {
+    comment: "",
+    errors: "",
+  };
+  handleChange = ({ target }) => {
+    let { value } = target;
+    this.setState({
+      comment: value,
+    });
+  };
+
+  handleSubmit = (event) => {
+    event.preventDefault();
+    let body = { comment: { body: this.state.comment } };
+    fetch(articlesURL + `/${this.props.slug}/comments/`, {
+      method: "POST",
+      headers: {
+        authorization: `Token ${this.props.user.token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        return res.json();
+      })
+      .then(({ comment }) => {
+        this.setState({ comment: "" });
+        this.props.fetchAllComments(this.props.slug);
+      })
+      .catch((errors) => this.setState({ errors: "Couldn't Post comment" }));
+  };
+
+  render() {
+    return (
+      <footer>
+        {this.state.errors ? (
+          <p className="text-red-500 text-center">{this.state.errors}</p>
+        ) : (
+          ""
+        )}
+        <form
+          action=""
+          className="mx-auto 2xl:w-1/2 font-0 my-4 w-full "
+          onSubmit={this.handleSubmit}
+        >
+          <textarea
+            id=""
+            value={this.state.comment}
+            rows="5"
+            name="comment"
+            placeholder="Write a comment"
+            onChange={this.handleChange}
+            className="w-full border-1 border-solid border-grey-200
+           rounded-t-md  mb-0 p-4 text-base focus:outline-0"
+          ></textarea>
+          <div
+            className="border-1 border-solid border-grey-200
+         rounded-b-md mt-0 py-2 text-base flex justify-between
+          items-center px-2 bg-gray-200"
+          >
+            <img
+              src={this.props.user.image || "images/smiley-cyrus.jpg"}
+              alt={this.props.user.username}
+              className="w-8 h-8 rounded-full"
+            />
+            <input
+              type="submit"
+              value="Post Comment"
+              className="bg-amber-500 text-white 
+          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
+            />
+          </div>
+        </form>
+
+        {/* View all comments */}
+        <div className="mx-auto 2xl:w-1/2 w-full my-4">
+          <Comments
+            slug={this.props.slug}
+            user={this.props.user}
+            comments={this.props.comments}
+            handleDeleteComment={this.props.handleDeleteComment}
+            error={this.props.error}
+          />
+        </div>
+      </footer>
+    );
+  }
+}
+
+function UnAuthenticatedFooter(props) {
+  return (
+    <footer>
+      <p className="text-center my-4">
+        <Link className="text-amber-500" to="/login">
+          Sign in
+        </Link>{" "}
+        or
+        <Link className="text-amber-500" to="/register">
+          {" "}
+          Sign Up
+        </Link>{" "}
+        to add comments to this article.
+      </p>
+      <div className="mx-auto 2xl :w-1/2 w-full my-4">
+        <Comments
+          slug={props.slug}
+          comments={props.comments}
+          error={props.error}
+        />
+      </div>
+    </footer>
+  );
 }
 
 function OtherUserButtons(props) {
@@ -211,150 +383,6 @@ function UserButtons(props) {
         Delete Article
       </button>
     </>
-  );
-}
-
-class AuthenticatedFooter extends React.Component {
-  state = {
-    comment: "",
-    comments: "",
-    errors: {
-      comment: "",
-      comments: "",
-    },
-  };
-  handleChange = ({ target }) => {
-    let { value } = target;
-    this.setState({
-      comment: value,
-    });
-  };
-  componentDidMount() {
-    this.fetchData("GET", "")
-      .then(({ comments }) => {
-        this.setState({ comments });
-      })
-      .catch((errors) =>
-        this.setState({ errors: { comments: "Couldn't Fetch comments" } })
-      );
-  }
-
-  fetchData = (verb, id, headers, body) => {
-    return fetch(articlesURL + `/${this.props.slug}/comments/${id}`, {
-      method: verb,
-      headers: headers
-        ? {
-            authorization: `Token ${this.props.user.token}`,
-            "Content-Type": "application/json",
-          }
-        : {},
-      body: JSON.stringify(body),
-    }).then((res) => {
-      if (!res.ok) {
-        return res.json().then(({ errors }) => Promise.reject(errors));
-      }
-      return res.json();
-    });
-  };
-  handleSubmit = (event) => {
-    event.preventDefault();
-    let body = { comment: { body: this.state.comment } };
-    this.fetchData("POST", "", true, body)
-      .then(({ comment }) => {
-        this.setState({ comment: "" });
-        this.fetchData("GET", "")
-          .then(({ comments }) => {
-            this.setState({ comments });
-          })
-          .catch((errors) =>
-            this.setState({ errors: { comments: "Couldn't Fetch comments" } })
-          );
-      })
-      .catch((errors) =>
-        this.setState({ errors: { comment: "Couldn't Post comment" } })
-      );
-  };
-  handleDeleteComment = async (id) => {
-    await this.fetchData("DELETE", id, true).catch((errors) =>
-      this.setState({ errors: { comments: "Couldn't Delete comments" } })
-    );
-    this.fetchData("GET", "")
-      .then(({ comments }) => {
-        this.setState({ comments });
-      })
-      .catch((errors) =>
-        this.setState({ errors: { comments: "Couldn't Fetch comments" } })
-      );
-  };
-  render() {
-    return (
-      <footer>
-        <form
-          action=""
-          className="mx-auto 2xl:w-1/2 font-0 my-4 w-full "
-          onSubmit={this.handleSubmit}
-        >
-          <textarea
-            id=""
-            value={this.state.comment}
-            rows="5"
-            name="comment"
-            placeholder="Write a comment"
-            onChange={this.handleChange}
-            className="w-full border-1 border-solid border-grey-200
-           rounded-t-md  mb-0 p-4 text-base focus:outline-0"
-          ></textarea>
-          <div
-            className="border-1 border-solid border-grey-200
-         rounded-b-md mt-0 py-2 text-base flex justify-between
-          items-center px-2 bg-gray-200"
-          >
-            <img
-              src={this.props.user.image || "images/smiley-cyrus.jpg"}
-              alt={this.props.user.username}
-              className="w-8 h-8 rounded-full"
-            />
-            <input
-              type="submit"
-              value="Post Comment"
-              className="bg-amber-500 text-white 
-          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
-            />
-          </div>
-        </form>
-
-        {/* View all comments */}
-        <div className="mx-auto sm:w-1/2 w-full my-4">
-          <Comments
-            slug={this.props.slug}
-            user={this.props.user}
-            comments={this.state.comments}
-            handleDeleteComment={this.handleDeleteComment}
-          />
-        </div>
-      </footer>
-    );
-  }
-}
-
-function UnAuthenticatedFooter(props) {
-  return (
-    <footer>
-      <p className="text-center my-4">
-        <Link className="text-amber-500" to="/login">
-          Sign in
-        </Link>{" "}
-        or
-        <Link className="text-amber-500" to="/register">
-          {" "}
-          Sign Up
-        </Link>{" "}
-        to add comments to this article.
-      </p>
-      <div className="mx-auto sm:w-1/2 w-full my-4">
-        <Comments slug={props.slug} />
-      </div>
-    </footer>
   );
 }
 

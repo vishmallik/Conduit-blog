@@ -6,76 +6,19 @@ import Posts from "./Posts";
 import SideBar from "./SideBar";
 
 export default class Home extends React.Component {
-  state = {
-    articles: null,
-    error: "",
-    articlesPerPage: 10,
-    articlesCount: 0,
-    currentPageIndex: 1,
-    activeTab: this.props.isLoggedIn ? "Your Feed" : "",
-  };
   componentDidMount() {
-    this.fetchData();
+    this.props.fetchData();
   }
   componentDidUpdate(prevProps, prevState) {
     if (
-      prevState.currentPageIndex !== this.state.currentPageIndex ||
-      prevState.activeTab !== this.state.activeTab
+      prevProps.currentPageIndex !== this.props.currentPageIndex ||
+      prevProps.activeTab !== this.props.activeTab
     ) {
-      this.fetchData();
+      this.props.fetchData();
     }
   }
-  fetchData = () => {
-    let limit = this.state.articlesPerPage;
-    let offset = (this.state.currentPageIndex - 1) * limit;
-    let tag = this.state.activeTab;
 
-    fetch(
-      articlesURL +
-        (this.state.activeTab === "Your Feed" ? "/feed" : "") +
-        `?limit=${limit}&offset=${offset}` +
-        (tag && `&tag=${tag}`),
-      {
-        headers: {
-          Authorization: `Token ${this.props.user.token}`,
-        },
-      }
-    )
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error(res.statusText);
-        }
-        return res.json();
-      })
-      .then((data) => {
-        this.setState({
-          articles: data.articles,
-          articlesCount: data.articlesCount,
-        });
-      })
-      .catch((err) => {
-        this.setState({ error: "Unable to fetch data!!!" });
-      });
-  };
-  updatePageIndex = (index) => {
-    this.setState({
-      currentPageIndex: index,
-    });
-  };
-  updateActiveTab = (tag) => {
-    this.setState({
-      activeTab: tag,
-    });
-  };
   render() {
-    let {
-      articles,
-      error,
-      articlesCount,
-      articlesPerPage,
-      currentPageIndex,
-      activeTab,
-    } = this.state;
     return (
       <main className="sm:container-md container-mobile sm:mx-auto mx-auto">
         <div className="py-6 mx-auto text-center">
@@ -85,26 +28,26 @@ export default class Home extends React.Component {
         <div className="sm:flex flex-wrap">
           <div className="xl:basis-3/4 basis-full">
             <FeedNav
-              activeTab={activeTab}
-              updateActiveTab={this.updateActiveTab}
+              activeTab={this.props.activeTab}
+              updateActiveTab={this.props.updateActiveTab}
               isLoggedIn={this.props.isLoggedIn}
             />
             <Posts
-              articles={articles}
-              error={error}
+              articles={this.props.articles}
+              error={this.props.error}
               handleFollow={this.props.handleFollow}
               handleFavorite={this.props.handleFavorite}
               isLoggedIn={this.props.isLoggedIn}
-              updateActiveTab={this.updateActiveTab}
+              updateActiveTab={this.props.updateActiveTab}
             />
             <Pagination
-              articlesCount={articlesCount}
-              articlesPerPage={articlesPerPage}
-              currentPageIndex={currentPageIndex}
-              updatePageIndex={this.updatePageIndex}
+              articlesCount={this.props.articlesCount}
+              articlesPerPage={this.props.articlesPerPage}
+              currentPageIndex={this.props.currentPageIndex}
+              updatePageIndex={this.props.updatePageIndex}
             />
           </div>
-          <SideBar updateActiveTab={this.updateActiveTab} />
+          <SideBar updateActiveTab={this.props.updateActiveTab} />
         </div>
       </main>
     );
