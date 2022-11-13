@@ -62,7 +62,7 @@ class Register extends React.Component {
   render() {
     let { username, password, email, empty } = this.state.errors;
     return (
-      <div className="sm:container-md container-mobile">
+      <div className="sm:container-md container-mobile min-h-screen">
         <h1
           className="text-center text-4xl font-semibold
          mt-6"

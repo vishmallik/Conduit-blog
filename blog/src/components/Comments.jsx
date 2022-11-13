@@ -3,6 +3,9 @@ import Loader from "./Loader";
 
 export default function Comments(props) {
   let { comments, handleDeleteComment } = props;
+  if (props.error) {
+    return <p className="text-red-500 text-center">{props.error}</p>;
+  }
   if (!comments) {
     return <Loader />;
   } else {
@@ -37,7 +40,7 @@ export default function Comments(props) {
                 <i
                   className="fa-solid fa-trash text-gray-400 cursor-pointer
                    text-sm hover:text-red-500 "
-                  onClick={() => handleDeleteComment(comment.id)}
+                  onClick={() => handleDeleteComment(comment.id, props.slug)}
                 ></i>
               ) : (
                 ""
