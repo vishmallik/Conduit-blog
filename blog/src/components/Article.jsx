@@ -19,7 +19,7 @@ class Article extends React.Component {
   componentDidMount() {
     let slug = this.props.match.params.slug;
     //fetch article
-    this.fetchData("GET", slug)
+    this.fetchData("GET", slug, false)
       .then((data) => {
         this.setState({
           article: data.article,
@@ -86,7 +86,6 @@ class Article extends React.Component {
     this.fetchData("DELETE", slug, true, true, id)
       .then((value) => (!value ? this.fetchAllComments(slug) : ""))
       .catch((errors) => {
-        console.log(errors);
         this.setState({ errors: { comments: "Couldn't Delete comments" } });
       });
   };
@@ -308,7 +307,7 @@ function UnAuthenticatedFooter(props) {
         <Comments
           slug={props.slug}
           comments={props.comments}
-          error={this.props.error}
+          error={props.error}
         />
       </div>
     </footer>
