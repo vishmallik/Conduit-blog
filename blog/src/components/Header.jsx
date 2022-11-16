@@ -107,7 +107,7 @@ function AuthHeader(props) {
       ></i>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu && props.handleMenuUpdate}
+        onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/" exact activeClassName="active-link">
           <i className="fas fa-home px-2"></i>
@@ -116,7 +116,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu && props.handleMenuUpdate}
+        onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/editor" activeClassName="active-link">
           <i className="fas fa-pen-to-square  px-2"></i>
@@ -125,7 +125,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu && props.handleMenuUpdate}
+        onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/settings" activeClassName="active-link">
           <i className="fas fa-gear  px-2"></i>
@@ -134,7 +134,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu && props.handleMenuUpdate}
+        onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink
           to={`/profile/@${props.user.username}`}
