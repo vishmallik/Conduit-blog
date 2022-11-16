@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
+import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
 
 class NewPost extends React.Component {
@@ -16,6 +17,7 @@ class NewPost extends React.Component {
       common: "",
     },
   };
+  static contextType = UserContext;
   componentDidMount() {
     if (this.props.location.state) {
       let { title, description, body, tagList } =
@@ -83,7 +85,7 @@ class NewPost extends React.Component {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Token ${this.props.user.token}`,
+        authorization: `Token ${this.context.user.token}`,
       },
       body: JSON.stringify(data),
     })
@@ -135,7 +137,7 @@ class NewPost extends React.Component {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Token ${this.props.user.token}`,
+        authorization: `Token ${this.context.user.token}`,
       },
       body: JSON.stringify(data),
     })

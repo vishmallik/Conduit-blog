@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
 import Posts from "./Posts";
@@ -11,6 +12,7 @@ class Profile extends React.Component {
     articles: [],
     errors: "",
   };
+  static contextType = UserContext;
   updateActiveTab = (tab) => {
     this.setState(
       {
@@ -45,14 +47,28 @@ class Profile extends React.Component {
         this.setState({ errors: "Unable to fetch Article!!!" })
       );
   };
+  handleFavorite = (verb, slug) => {
+    fetch(articlesURL + `/${slug}/favorite`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        this.fetchData();
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete favorite request" })
+      );
+  };
+
   render() {
     return (
       <>
-        <ProfileData
-          username={this.props.match.params.username}
-          user={this.props.user}
-          handleFollow={this.props.handleFollow}
-        />
+        <ProfileData username={this.props.match.params.username} />
 
         <div className="sm:container-md container-mobile my-4 min-h-screen sm:my-10 sm:text-left">
           <span
@@ -81,8 +97,7 @@ class Profile extends React.Component {
             <div>
               <Posts
                 articles={this.state.articles}
-                handleFavorite={this.props.handleFavorite}
-                isLoggedIn={this.props.isLoggedIn}
+                handleFavorite={this.handleFavorite}
               />
             </div>
           )}
@@ -95,7 +110,26 @@ class Profile extends React.Component {
 class ProfileData extends React.Component {
   state = {
     profile: "",
+    following: false,
     errors: "",
+  };
+  static contextType = UserContext;
+  handleFollow = (verb, username) => {
+    fetch(profileURL + `/${username}/follow`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        this.setState({ following: !this.state.following });
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete follow request" })
+      );
   };
   componentDidMount() {
     this.fetchData();
@@ -142,12 +176,13 @@ class ProfileData extends React.Component {
           />
           <h2 className="text-2xl font-bold">{username}</h2>
           <p className="text-gray-400">{bio}</p>
-          {username === this.props.user.username ? (
+          {username === this.context.user.username ? (
             <SettingsButton />
           ) : (
             <FollowButton
               username={username}
-              handleFollow={this.props.handleFollow}
+              handleFollow={this.handleFollow}
+              following={this.state.following}
             />
           )}
         </div>
@@ -173,13 +208,18 @@ function SettingsButton(props) {
 function FollowButton(props) {
   return (
     <button
-      className="border-1 my-2 rounded-md
-             border-solid border-gray-500 px-2
-              text-gray-500 hover:bg-amber-300 hover:text-white sm:ml-auto
-               sm:mr-0 sm:block"
-      onClick={() => props.handleFollow("POST", props.username)}
+      className={`border-1
+             my-2 rounded-md border-solid
+              border-gray-500 px-2 text-gray-500 hover:bg-amber-300
+               hover:text-white sm:ml-auto sm:mr-0
+               sm:block`}
+      onClick={
+        props.following
+          ? () => props.handleFollow("POST", props.username)
+          : () => props.handleFollow("DELETE", props.username)
+      }
     >
-      {`+ Follow ${props.username}`}
+      {`${props.following ? "- Unfollow" : "+ Follow"} ${props.username}`}
     </button>
   );
 }

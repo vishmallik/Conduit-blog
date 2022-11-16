@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
 import Loader from "./Loader";
 
@@ -9,6 +10,7 @@ export default class Comments extends React.Component {
     comment: "",
     errors: "",
   };
+  static contextType = UserContext;
 
   componentDidMount() {
     this.fetchAllComments();
@@ -19,7 +21,7 @@ export default class Comments extends React.Component {
       method: verb,
       headers: headers
         ? {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
             "Content-Type": "application/json",
           }
         : {},
@@ -79,7 +81,7 @@ export default class Comments extends React.Component {
 
     return (
       <footer>
-        {!this.props.isLoggedIn ? (
+        {!this.context.isLoggedIn ? (
           <p className="my-4 text-center">
             <Link className="text-amber-500" to="/login">
               Sign in{" "}
@@ -111,8 +113,8 @@ export default class Comments extends React.Component {
           py-2 px-2 text-base"
             >
               <img
-                src={this.props.user.image || "images/smiley-cyrus.jpg"}
-                alt={this.props.user.username}
+                src={this.context.user.image || "images/smiley-cyrus.jpg"}
+                alt={this.context.user.username}
                 className="h-8 w-8 rounded-full"
               />
               <input
@@ -158,8 +160,9 @@ export default class Comments extends React.Component {
                         {new Date(comment.createdAt).toDateString()}
                       </span>
                     </div>
-                    {this.props.user &&
-                      this.props.user.username === comment.author.username && (
+                    {this.context.user &&
+                      this.context.user.username ===
+                        comment.author.username && (
                         <i
                           className="fa-solid fa-trash cursor-pointer text-sm
                    text-gray-400 hover:text-red-500 "

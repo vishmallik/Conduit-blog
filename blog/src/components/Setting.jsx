@@ -1,5 +1,6 @@
 import React from "react";
 import { withRouter } from "react-router";
+import { UserContext } from "../context/UserContext";
 import { verifyURL } from "../utils/urls";
 import validate from "../utils/validate";
 
@@ -20,12 +21,13 @@ class Setting extends React.Component {
     },
     success: "",
   };
+  static contextType = UserContext;
   componentDidMount() {
     this.setState({
-      email: this.props.user.email || "",
-      username: this.props.user.username || "",
-      image: this.props.user.image || "",
-      bio: this.props.user.bio || "",
+      email: this.context.user.email || "",
+      username: this.context.user.username || "",
+      image: this.context.user.image || "",
+      bio: this.context.user.bio || "",
     });
   }
   onChange = ({ target }) => {
@@ -61,7 +63,7 @@ class Setting extends React.Component {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Token ${this.props.user.token}`,
+        authorization: `Token ${this.context.user.token}`,
       },
       body: JSON.stringify(data),
     })

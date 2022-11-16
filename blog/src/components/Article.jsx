@@ -1,19 +1,24 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
-import { articlesURL } from "../utils/urls";
+import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
 import Comments from "./Comments";
 import remarkGfm from "remark-gfm";
 import ReactMarkdown from "react-markdown";
+import { UserContext } from "../context/UserContext";
 
 class Article extends React.Component {
   state = {
     article: "",
     errors: "",
   };
+  static contextType = UserContext;
 
   componentDidMount() {
     //fetch article
+    this.fetchAllArticles();
+  }
+  fetchAllArticles = () => {
     this.fetchData("GET")
       .then((data) => {
         this.setState({
@@ -25,7 +30,7 @@ class Article extends React.Component {
           errors: "Unable to fetch article!!!",
         });
       });
-  }
+  };
 
   fetchData = (verb, headers = false, body) => {
     let slug = this.props.match.params.slug;
@@ -33,7 +38,7 @@ class Article extends React.Component {
       method: verb,
       headers: headers
         ? {
-            authorization: `Token ${this.props.user.token}`,
+            authorization: `Token ${this.context.user.token}`,
             "Content-Type": "application/json",
           }
         : {},
@@ -47,6 +52,39 @@ class Article extends React.Component {
       }
       return res.json();
     });
+  };
+  handleFavorite = (verb, slug) => {
+    fetch(articlesURL + `/${slug}/favorite`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        this.fetchAllArticles();
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete favorite request" })
+      );
+  };
+  handleFollow = (verb, username) => {
+    fetch(profileURL + `/${username}/follow`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete follow request" })
+      );
   };
   handleDelete = () => {
     this.fetchData("DELETE", true)
@@ -99,17 +137,17 @@ class Article extends React.Component {
                   {new Date(article.createdAt).toDateString()}
                 </p>
               </div>
-              {this.props.user ? (
-                article.author.username === this.props.user.username ? (
+              {this.context.user ? (
+                article.author.username === this.context.user.username ? (
                   <UserButtons
                     handleDelete={this.handleDelete}
                     article={article}
                   />
                 ) : (
                   <OtherUserButtons
-                    handleFollow={this.props.handleFollow}
                     article={article}
-                    handleFavorite={this.props.handleFavorite}
+                    handleFavorite={this.handleFavorite}
+                    handleFollow={this.handleFollow}
                   />
                 )
               ) : (
@@ -141,32 +179,26 @@ class Article extends React.Component {
             })}
           </ul>
           <hr className="my-4" />
-          <Comments
-            isLoggedIn={this.props.isLoggedIn}
-            slug={article.slug}
-            user={this.props.user}
-          />
+          <Comments slug={article.slug} />
         </div>
       </section>
     );
   }
 }
 
-function OtherUserButtons(props) {
+function OtherUserButtons({ article, handleFollow, handleFavorite }) {
   return (
     <>
-      {props.article.author.following ? (
+      {article.author.following ? (
         <button
           className="border-1 mr-4 mb-4 w-full
         rounded-md border-solid border-green-500
         px-2 py-1 text-sm font-bold text-green-500
         hover:bg-green-500 hover:text-white sm:mb-0 sm:block sm:w-auto"
-          onClick={() =>
-            props.handleFollow("DELETE", props.article.author.username)
-          }
+          onClick={() => handleFollow("DELETE", article.author.username)}
         >
           <i className="fas fa-minus pr-2"></i>
-          UnFollow {props.article.author.username}
+          UnFollow {article.author.username}
         </button>
       ) : (
         <button
@@ -174,12 +206,10 @@ function OtherUserButtons(props) {
         rounded-md border-solid border-green-500
           px-2 py-1 text-sm font-bold text-green-500
           hover:bg-green-500 hover:text-white sm:mr-4 sm:mb-0 sm:w-auto"
-          onClick={() =>
-            props.handleFollow("POST", props.article.author.username)
-          }
+          onClick={() => handleFollow("POST", article.author.username)}
         >
           <i className="fas fa-plus pr-2"></i>
-          Follow {props.article.author.username}
+          Follow {article.author.username}
         </button>
       )}
 
@@ -187,7 +217,7 @@ function OtherUserButtons(props) {
         className={`border-1 block w-full rounded-md border-solid
          border-teal-500 px-2 py-1 text-sm
           font-bold text-teal-500 hover:bg-teal-500 hover:text-white sm:w-auto `}
-        onClick={() => props.handleFavorite("POST", props.article.slug)}
+        onClick={() => handleFavorite("POST", article.slug)}
       >
         <i className="fas fa-heart pr-2"></i>
         Favorite Post
@@ -196,7 +226,7 @@ function OtherUserButtons(props) {
   );
 }
 
-function UserButtons(props) {
+function UserButtons({ article, handleDelete }) {
   return (
     <>
       <button
@@ -205,7 +235,7 @@ function UserButtons(props) {
           px-2 py-1 text-sm font-bold text-cyan-500
           hover:bg-cyan-500 hover:text-white sm:mr-4 sm:mb-0 sm:w-auto"
       >
-        <Link to={{ pathname: "/editor", state: { article: props.article } }}>
+        <Link to={{ pathname: "/editor", state: { article: article } }}>
           <i className="fas fa-pen pr-2"></i>
           Edit Article
         </Link>
@@ -215,7 +245,7 @@ function UserButtons(props) {
         rounded-md border-solid border-red-500
            px-2 py-1 text-sm font-bold
           text-red-500 hover:bg-red-500 hover:text-white sm:mb-0 sm:w-auto"
-        onClick={props.handleDelete}
+        onClick={handleDelete}
       >
         <i className="fas fa-trash pr-2"></i>
         Delete Article
