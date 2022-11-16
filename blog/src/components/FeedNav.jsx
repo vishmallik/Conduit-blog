@@ -3,12 +3,11 @@ import { Link } from "react-router-dom";
 export default function FeedNav(props) {
   return (
     <>
-      {props.isLoggedIn ? (
+      {props.isLoggedIn && (
         <Link
-          className={`px-1 mr-2  ${
-            props.activeTab === "Your Feed"
-              ? "border-solid border-b-2 border-amber-500 text-amber-500"
-              : ""
+          className={`mr-2 px-1  ${
+            props.activeTab === "Your Feed" &&
+            "border-b-2 border-solid border-amber-500 text-amber-500"
           }`}
           to="/"
           onClick={() => {
@@ -17,15 +16,12 @@ export default function FeedNav(props) {
         >
           Your Feed
         </Link>
-      ) : (
-        ""
       )}
 
       <Link
-        className={`px-1 mr-2  ${
-          props.activeTab
-            ? ""
-            : "border-solid border-b-2 border-amber-500 text-amber-500"
+        className={`mr-2 px-1  ${
+          !props.activeTab &&
+          "border-b-2 border-solid border-amber-500 text-amber-500"
         }`}
         to="/"
         onClick={() => {
@@ -36,10 +32,10 @@ export default function FeedNav(props) {
       </Link>
       {props.activeTab && props.activeTab !== "Your Feed" && (
         <Link
-          className={`px-1 mr-2  ${
-            props.activeTab && props.activeTab !== "Your Feed"
-              ? "border-solid border-b-2 border-amber-500 text-amber-500"
-              : ""
+          className={`mr-2 px-1  ${
+            props.activeTab &&
+            props.activeTab !== "Your Feed" &&
+            "border-b-2 border-solid border-amber-500 text-amber-500"
           }`}
           to="/"
         >

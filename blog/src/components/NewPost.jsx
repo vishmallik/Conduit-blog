@@ -167,7 +167,7 @@ class NewPost extends React.Component {
     let { title, description, body, tagList, errors } = this.state;
     if (errors.common) {
       return (
-        <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+        <p className="min-h-screen py-8 text-center text-2xl text-red-500">
           {errors.common}
         </p>
       );
@@ -175,7 +175,7 @@ class NewPost extends React.Component {
     return (
       <form
         action=""
-        className="sm:container-md flex flex-col sm:w-1/2 container-mobile w-full pt-4 pb-20"
+        className="sm:container-md container-mobile flex w-full flex-col pt-4 pb-20 sm:w-1/2"
         onSubmit={
           this.props.location.state ? this.handleEdit : this.handleSubmit
         }
@@ -184,26 +184,26 @@ class NewPost extends React.Component {
           type="text"
           name="title"
           placeholder="Article Title"
-          className={`text-xl px-6 py-2 my-2 mt-16 rounded-md border-1
-           border-solid border-slate-400  focus:outline-blue-300 ${
-             errors.title ? "border-red-400" : ""
+          className={`border-1 my-2 mt-16 rounded-md border-solid border-slate-400 px-6
+           py-2 text-xl  focus:outline-blue-300 ${
+             errors.title && "border-red-400"
            }`}
           onChange={this.handleChange}
           value={title}
         />
-        <span className="text-sm mx-auto text-red-500">{errors.title}</span>
+        <span className="mx-auto text-sm text-red-500">{errors.title}</span>
         <input
           type="text"
           name="description"
           placeholder="What's this article about?"
-          className={`px-6 py-2 my-2 rounded-md border-1 border-solid
-           border-slate-400 focus:outline-blue-300 ${
-             errors.description ? "border-red-400" : ""
+          className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6
+           py-2 focus:outline-blue-300 ${
+             errors.description && "border-red-400"
            }`}
           onChange={this.handleChange}
           value={description}
         />
-        <span className="text-sm mx-auto text-red-500">
+        <span className="mx-auto text-sm text-red-500">
           {errors.description}
         </span>
 
@@ -212,34 +212,32 @@ class NewPost extends React.Component {
           name="body"
           placeholder="Write your article (in markdown)"
           rows="10"
-          className={` px-6 py-2 my-2 rounded-md border-1 border-solid
-           border-slate-400 focus:outline-blue-300 ${
-             errors.body ? "border-red-400" : ""
-           }`}
+          className={` border-1 my-2 rounded-md border-solid border-slate-400 px-6
+           py-2 focus:outline-blue-300 ${errors.body && "border-red-400"}`}
           onChange={this.handleChange}
           value={body}
         ></textarea>
-        <span className="text-sm mx-auto text-red-500">{errors.body}</span>
+        <span className="mx-auto text-sm text-red-500">{errors.body}</span>
 
         <input
           type="text"
           name="tagList"
           placeholder="Enter Tags"
-          className={`px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400 focus:outline-blue-300 ${
-            errors.tagList ? "border-red-400" : ""
+          className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300 ${
+            errors.tagList && "border-red-400"
           }`}
           onChange={this.handleChange}
           value={tagList}
         />
-        <span className="text-sm mx-auto text-red-500">{errors.tagList}</span>
+        <span className="mx-auto text-sm text-red-500">{errors.tagList}</span>
 
         <input
           type="submit"
           value={
             this.props.location.state ? "Update Article" : "Publish Article"
           }
-          className="bg-amber-500 sm:mr-0 sm:ml-auto px-6 py-2 mt-4 text-white
-      rounded-md text-lg cursor-pointer disabled:cursor-not-allowed disabled:bg-gray-400 sm:inline-block block"
+          className="mt-4 block cursor-pointer rounded-md bg-amber-500 px-6 py-2
+      text-lg text-white disabled:cursor-not-allowed disabled:bg-gray-400 sm:mr-0 sm:ml-auto sm:inline-block"
         />
       </form>
     );

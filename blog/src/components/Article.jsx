@@ -95,14 +95,14 @@ class Article extends React.Component {
 
     if (errors.article) {
       return (
-        <p className="min-h-screen text-center py-10 text-3xl text-red-500">
+        <p className="min-h-screen py-10 text-center text-3xl text-red-500">
           {errors.article}
         </p>
       );
     }
     if (!article) {
       return (
-        <div className="w-3/4 mx-auto min-h-screen">
+        <div className="mx-auto min-h-screen w-3/4">
           <Loader />
         </div>
       );
@@ -111,7 +111,7 @@ class Article extends React.Component {
       <section className="min-h-screen">
         <div className="bg-zinc-600 ">
           <div className="container-md py-10">
-            <h2 className="text-white text-4xl font-semibold py-4 mb-4">
+            <h2 className="mb-4 py-4 text-4xl font-semibold text-white">
               {article.title}
             </h2>
             <div className="flex flex-wrap  items-center">
@@ -119,7 +119,7 @@ class Article extends React.Component {
                 <img
                   src={article.author.image || "/images/smiley-cyrus.jpg"}
                   alt={article.author.username}
-                  className="w-10 h-10 rounded-full mr-4"
+                  className="mr-4 h-10 w-10 rounded-full"
                 />
               </Link>
               <div className="mr-10 mb-6 sm:mb-0">
@@ -128,7 +128,7 @@ class Article extends React.Component {
                     {article.author.username}
                   </p>
                 </Link>
-                <p className="text-gray-400 text-xs">
+                <p className="text-xs text-gray-400">
                   {new Date(article.createdAt).toDateString()}
                 </p>
               </div>
@@ -152,8 +152,9 @@ class Article extends React.Component {
           </div>
         </div>
         <div className="sm:container-md container-mobile ">
-          <span className="whitespace-pre-line text-lg text-justify py-6 break-words">
+          <span className="whitespace-pre-line break-words py-6 text-justify text-lg">
             <ReactMarkdown
+              className="py-6"
               children={article.body}
               remarkPlugins={[remarkGfm]}
             />
@@ -163,9 +164,9 @@ class Article extends React.Component {
               return (
                 <li
                   key={tag}
-                  className="inline-block text-sm ml-2
-                   rounded-full px-2 border-2 my-4 border-solid
-                    border-yellow-300 bg-yellow-200"
+                  className="my-4 ml-2 inline-block
+                   rounded-full border-2 border-solid border-yellow-300 bg-yellow-200
+                    px-2 text-sm"
                 >
                   {tag}
                 </li>
@@ -235,14 +236,11 @@ class AuthenticatedFooter extends React.Component {
   render() {
     return (
       <footer>
-        {this.state.errors ? (
-          <p className="text-red-500 text-center">{this.state.errors}</p>
-        ) : (
-          ""
+        {this.state.errors && (
+          <p className="text-center text-red-500">{this.state.errors}</p>
         )}
         <form
-          action=""
-          className="mx-auto 2xl:w-1/2 font-0 my-4 w-full "
+          className="font-0 mx-auto my-4 w-full 2xl:w-1/2 "
           onSubmit={this.handleSubmit}
         >
           <textarea
@@ -252,30 +250,30 @@ class AuthenticatedFooter extends React.Component {
             name="comment"
             placeholder="Write a comment"
             onChange={this.handleChange}
-            className="w-full border-1 border-solid border-grey-200
-           rounded-t-md  mb-0 p-4 text-base focus:outline-0"
-          ></textarea>
+            className="border-1 border-grey-200 mb-0 w-full
+           rounded-t-md  border-solid p-4 text-base focus:outline-0"
+          />
           <div
-            className="border-1 border-solid border-grey-200
-         rounded-b-md mt-0 py-2 text-base flex justify-between
-          items-center px-2 bg-gray-200"
+            className="border-1 border-grey-200 mt-0
+         flex items-center justify-between rounded-b-md border-solid bg-gray-200
+          py-2 px-2 text-base"
           >
             <img
               src={this.props.user.image || "images/smiley-cyrus.jpg"}
               alt={this.props.user.username}
-              className="w-8 h-8 rounded-full"
+              className="h-8 w-8 rounded-full"
             />
             <input
               type="submit"
               value="Post Comment"
-              className="bg-amber-500 text-white 
-          px-2 py-1 rounded-md ml-auto mr-0 cursor-pointer"
+              className="ml-auto mr-0 
+          cursor-pointer rounded-md bg-amber-500 px-2 py-1 text-white"
             />
           </div>
         </form>
 
         {/* View all comments */}
-        <div className="mx-auto 2xl:w-1/2 w-full my-4">
+        <div className="mx-auto my-4 w-full 2xl:w-1/2">
           <Comments
             slug={this.props.slug}
             user={this.props.user}
@@ -292,18 +290,17 @@ class AuthenticatedFooter extends React.Component {
 function UnAuthenticatedFooter(props) {
   return (
     <footer>
-      <p className="text-center my-4">
+      <p className="my-4 text-center">
         <Link className="text-amber-500" to="/login">
           Sign in
-        </Link>{" "}
+        </Link>
         or
         <Link className="text-amber-500" to="/register">
-          {" "}
           Sign Up
-        </Link>{" "}
+        </Link>
         to add comments to this article.
       </p>
-      <div className="mx-auto 2xl :w-1/2 w-full my-4">
+      <div className="mx-auto my-4 w-full 2xl:w-1/2">
         <Comments
           slug={props.slug}
           comments={props.comments}
@@ -319,10 +316,10 @@ function OtherUserButtons(props) {
     <>
       {props.article.author.following ? (
         <button
-          className="px-2 py-1 border-1 border-solid
-        border-green-500 text-green-500 rounded-md
-        mr-4 sm:block hover:bg-green-500 text-sm font-bold
-        hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+          className="border-1 mr-4 mb-4 w-full
+        rounded-md border-solid border-green-500
+        px-2 py-1 text-sm font-bold text-green-500
+        hover:bg-green-500 hover:text-white sm:mb-0 sm:block sm:w-auto"
           onClick={() =>
             props.handleFollow("DELETE", props.article.author.username)
           }
@@ -332,10 +329,10 @@ function OtherUserButtons(props) {
         </button>
       ) : (
         <button
-          className="px-2 py-1 border-1 border-solid
-        border-green-500 text-green-500 rounded-md
-          sm:mr-4 block hover:bg-green-500 text-sm font-bold
-          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+          className="border-1 mb-4 block w-full
+        rounded-md border-solid border-green-500
+          px-2 py-1 text-sm font-bold text-green-500
+          hover:bg-green-500 hover:text-white sm:mr-4 sm:mb-0 sm:w-auto"
           onClick={() =>
             props.handleFollow("POST", props.article.author.username)
           }
@@ -346,9 +343,9 @@ function OtherUserButtons(props) {
       )}
 
       <button
-        className={`px-2 py-1 border-1 border-solid border-teal-500
-         text-teal-500 rounded-md block hover:bg-teal-500
-          text-sm font-bold hover:text-white w-full sm:w-auto `}
+        className={`border-1 block w-full rounded-md border-solid
+         border-teal-500 px-2 py-1 text-sm
+          font-bold text-teal-500 hover:bg-teal-500 hover:text-white sm:w-auto `}
         onClick={() => props.handleFavorite("POST", props.article.slug)}
       >
         <i className="fas fa-heart pr-2"></i>
@@ -362,10 +359,10 @@ function UserButtons(props) {
   return (
     <>
       <button
-        className="px-2 py-1 border-1 border-solid
-        border-cyan-500 text-cyan-500 rounded-md
-          sm:mr-4 block hover:bg-cyan-500 text-sm font-bold
-          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+        className="border-1 mb-4 block w-full
+        rounded-md border-solid border-cyan-500
+          px-2 py-1 text-sm font-bold text-cyan-500
+          hover:bg-cyan-500 hover:text-white sm:mr-4 sm:mb-0 sm:w-auto"
       >
         <Link to={{ pathname: "/editor", state: { article: props.article } }}>
           <i className="fas fa-pen pr-2"></i>
@@ -373,10 +370,10 @@ function UserButtons(props) {
         </Link>
       </button>
       <button
-        className="px-2 py-1 border-1 border-solid
-        border-red-500 text-red-500 rounded-md
-           block hover:bg-red-500 text-sm font-bold
-          hover:text-white w-full sm:w-auto mb-4 sm:mb-0"
+        className="border-1 mb-4 block w-full
+        rounded-md border-solid border-red-500
+           px-2 py-1 text-sm font-bold
+          text-red-500 hover:bg-red-500 hover:text-white sm:mb-0 sm:w-auto"
         onClick={props.handleDelete}
       >
         <i className="fas fa-trash pr-2"></i>

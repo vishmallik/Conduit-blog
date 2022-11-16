@@ -64,74 +64,73 @@ class Register extends React.Component {
     return (
       <div className="sm:container-md container-mobile min-h-screen">
         <h1
-          className="text-center text-4xl font-semibold
-         mt-6"
+          className="mt-6 text-center text-4xl
+         font-semibold"
         >
           Sign Up
         </h1>
         <Link
           to="/login"
-          className="text-amber-400 text-center block pt-2 
-          pb-6 hover:underline"
+          className="block pt-2 pb-6 text-center 
+          text-amber-400 hover:underline"
         >
           Have an account?
         </Link>
-        <span className="text-center block text-red-500 text-sm">
-          {this.state.errors.server_res
-            ? "Email " + this.state.errors.server_res.email ||
-              "Username " + this.state.errors.server_res.username
-            : ""}
+        <span className="block text-center text-sm text-red-500">
+          {this.state.errors.server_res &&
+            ("Email " + this.state.errors.server_res.email ||
+              "Username " + this.state.errors.server_res.username)}
         </span>
         <form
-          className="flex flex-col sm:w-1/2 w-full mx-auto"
+          className="mx-auto flex w-full flex-col sm:w-1/2"
           onSubmit={this.handleSubmit}
         >
           <input
             type="text"
             name="username"
-            className={`border-2 border-solid border-slate-200
-             py-2 px-4 text-lg my-2 rounded-sm focus:outline-none 
-             ${username && "border-red-500 rounded-sm"}`}
+            className={`my-2 rounded-sm border-2
+             border-solid border-slate-200 py-2 px-4 text-lg focus:outline-none 
+             ${username && "rounded-sm border-red-500"}`}
             placeholder="Username"
             onChange={this.handleChange}
             value={this.state.username}
           />
           {username && (
-            <span className="text-red-600 text-center text-sm">{username}</span>
+            <span className="text-center text-sm text-red-600">{username}</span>
           )}
           <input
             type="email"
             name="email"
-            className={`border-2 border-solid border-slate-200
-             py-2 px-4 text-lg my-2 rounded-sm focus:outline-none 
-             ${email && "border-red-500 rounded-sm"}`}
+            className={`my-2 rounded-sm border-2
+             border-solid border-slate-200 py-2 px-4 text-lg focus:outline-none 
+             ${email && "rounded-sm border-red-500"}`}
             placeholder="Email"
             onChange={this.handleChange}
             value={this.state.email}
           />
           {email && (
-            <span className="text-red-600 text-center text-sm">{email}</span>
+            <span className="text-center text-sm text-red-600">{email}</span>
           )}
           <input
             type="password"
             name="password"
-            className={`border-2 border-solid border-slate-200
-             py-2 px-4 text-lg my-2 rounded-sm focus:outline-none 
-             ${password && "border-red-500 rounded-sm"}`}
+            className={`my-2 rounded-sm border-2
+             border-solid border-slate-200 py-2 px-4 text-lg focus:outline-none 
+             ${password && "rounded-sm border-red-500"}`}
             placeholder="Password"
             onChange={this.handleChange}
             value={this.state.password}
           />
           {password && (
-            <span className="text-red-600 text-center text-sm">{password}</span>
+            <span className="text-center text-sm text-red-600">{password}</span>
           )}
           <input
             type="submit"
             value="Sign Up"
             disabled={empty || username || password || email}
-            className="bg-amber-400 px-8 py-2 rounded-md
-              sm:ml-auto sm:mr-0 my-4 text-lg text-white
-               hover:cursor-pointer disabled:bg-gray-400 "
+            className="my-4 rounded-md bg-amber-400 px-8
+              py-2 text-lg text-white hover:cursor-pointer disabled:bg-gray-400
+               sm:ml-auto sm:mr-0 "
           />
         </form>
       </div>

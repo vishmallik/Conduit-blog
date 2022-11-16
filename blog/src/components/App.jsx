@@ -29,7 +29,7 @@ export default class App extends React.Component {
     articlesPerPage: 10,
     articlesCount: 0,
     currentPageIndex: 1,
-    activeTab: this.props.isLoggedIn ? "Your Feed" : "",
+    activeTab: "",
   };
   updateUser = (user) => {
     this.setState({
@@ -91,7 +91,12 @@ export default class App extends React.Component {
           }
           return res.json();
         })
-        .then(({ user }) => this.updateUser(user))
+        .then(({ user }) => {
+          this.updateUser(user);
+          this.setState({
+            activeTab: "Your Feed",
+          });
+        })
         .catch((error) => {
           this.setState({ errors: "Can't Verify User" });
         });
@@ -151,7 +156,7 @@ export default class App extends React.Component {
       <BrowserRouter>
         <Header isLoggedIn={this.state.isLoggedIn} user={this.state.user} />
         {this.state.errors ? (
-          <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+          <p className="min-h-screen py-8 text-center text-2xl text-red-500">
             {this.state.errors}
           </p>
         ) : this.state.isLoggedIn ? (
