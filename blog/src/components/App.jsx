@@ -145,7 +145,7 @@ export default class App extends React.Component {
   };
   updateActiveTab = (tag) => {
     this.setState({
-      activeTab: tag,
+      activeTab: {},
     });
   };
   render() {
