@@ -29,14 +29,11 @@ export default class Home extends React.Component {
             <FeedNav
               activeTab={this.props.activeTab}
               updateActiveTab={this.props.updateActiveTab}
-              isLoggedIn={this.props.isLoggedIn}
             />
             <Posts
               articles={this.props.articles}
               error={this.props.error}
-              handleFollow={this.props.handleFollow}
               handleFavorite={this.props.handleFavorite}
-              isLoggedIn={this.props.isLoggedIn}
               updateActiveTab={this.props.updateActiveTab}
             />
             <Pagination

@@ -17,6 +17,7 @@ import NewPost from "./NewPost";
 import Setting from "./Setting";
 import Profile from "./Profile";
 import Footer from "./Footer";
+import { UserContext } from "../context/UserContext";
 
 export default class App extends React.Component {
   state = {
@@ -154,46 +155,46 @@ export default class App extends React.Component {
     }
     return (
       <BrowserRouter>
-        <Header isLoggedIn={this.state.isLoggedIn} user={this.state.user} />
-        {this.state.errors ? (
-          <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-            {this.state.errors}
-          </p>
-        ) : this.state.isLoggedIn ? (
-          <AuthenticatedApp
-            isLoggedIn={this.state.isLoggedIn}
-            user={this.state.user}
-            updateUser={this.updateUser}
-            updateIsLoggedIn={this.updateIsLoggedIn}
-            handleFollow={this.handleFollow}
-            handleFavorite={this.handleFavorite}
-            articles={this.state.articles}
-            articlesPerPage={this.state.articlesPerPage}
-            articlesCount={this.state.articlesCount}
-            currentPageIndex={this.state.currentPageIndex}
-            activeTab={this.state.activeTab}
-            error={this.state.error}
-            fetchData={this.fetchData}
-            updateActiveTab={this.updateActiveTab}
-            updatePageIndex={this.updatePageIndex}
-          />
-        ) : (
-          <UnAuthenticatedApp
-            isLoggedIn={this.state.isLoggedIn}
-            user={this.state.user}
-            updateUser={this.updateUser}
-            articles={this.state.articles}
-            articlesPerPage={this.state.articlesPerPage}
-            articlesCount={this.state.articlesCount}
-            currentPageIndex={this.state.currentPageIndex}
-            activeTab={this.state.activeTab}
-            error={this.state.error}
-            fetchData={this.fetchData}
-            updateActiveTab={this.updateActiveTab}
-            updatePageIndex={this.updatePageIndex}
-          />
-        )}
-        <Footer />
+        <UserContext.Provider
+          value={{ isLoggedIn: this.state.isLoggedIn, user: this.state.user }}
+        >
+          <Header />
+          {this.state.errors ? (
+            <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+              {this.state.errors}
+            </p>
+          ) : this.state.isLoggedIn ? (
+            <AuthenticatedApp
+              updateUser={this.updateUser}
+              updateIsLoggedIn={this.updateIsLoggedIn}
+              handleFollow={this.handleFollow}
+              handleFavorite={this.handleFavorite}
+              articles={this.state.articles}
+              articlesPerPage={this.state.articlesPerPage}
+              articlesCount={this.state.articlesCount}
+              currentPageIndex={this.state.currentPageIndex}
+              activeTab={this.state.activeTab}
+              error={this.state.error}
+              fetchData={this.fetchData}
+              updateActiveTab={this.updateActiveTab}
+              updatePageIndex={this.updatePageIndex}
+            />
+          ) : (
+            <UnAuthenticatedApp
+              updateUser={this.updateUser}
+              articles={this.state.articles}
+              articlesPerPage={this.state.articlesPerPage}
+              articlesCount={this.state.articlesCount}
+              currentPageIndex={this.state.currentPageIndex}
+              activeTab={this.state.activeTab}
+              error={this.state.error}
+              fetchData={this.fetchData}
+              updateActiveTab={this.updateActiveTab}
+              updatePageIndex={this.updatePageIndex}
+            />
+          )}
+          <Footer />
+        </UserContext.Provider>
       </BrowserRouter>
     );
   }
@@ -204,8 +205,6 @@ function AuthenticatedApp(props) {
     <Switch>
       <Route path="/" exact>
         <Home
-          isLoggedIn={props.isLoggedIn}
-          user={props.user}
           handleFavorite={props.handleFavorite}
           articles={props.articles}
           articlesPerPage={props.articlesPerPage}
@@ -219,27 +218,22 @@ function AuthenticatedApp(props) {
         />
       </Route>
       <Route path="/editor">
-        <NewPost user={props.user} />
+        <NewPost />
       </Route>
       <Route path="/settings">
         <Setting
-          user={props.user}
           updateUser={props.updateUser}
           updateIsLoggedIn={props.updateIsLoggedIn}
         />
       </Route>
       <Route path="/profile/@:username">
         <Profile
-          user={props.user}
           handleFavorite={props.handleFavorite}
-          isLoggedIn={props.isLoggedIn}
           handleFollow={props.handleFollow}
         />
       </Route>
       <Route path="/article/:slug" exact>
         <Article
-          user={props.user}
-          isLoggedIn={props.isLoggedIn}
           handleFollow={props.handleFollow}
           handleFavorite={props.handleFavorite}
         />
@@ -256,7 +250,6 @@ function UnAuthenticatedApp(props) {
     <Switch>
       <Route path="/" exact>
         <Home
-          isLoggedIn={props.isLoggedIn}
           error={props.error}
           articles={props.articles}
           fetchData={props.fetchData}

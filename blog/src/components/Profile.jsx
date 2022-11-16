@@ -1,6 +1,7 @@
 import React from "react";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
 import Posts from "./Posts";
@@ -50,7 +51,6 @@ class Profile extends React.Component {
       <>
         <ProfileData
           username={this.props.match.params.username}
-          user={this.props.user}
           handleFollow={this.props.handleFollow}
         />
 
@@ -82,7 +82,6 @@ class Profile extends React.Component {
               <Posts
                 articles={this.state.articles}
                 handleFavorite={this.props.handleFavorite}
-                isLoggedIn={this.props.isLoggedIn}
               />
             </div>
           )}
@@ -97,6 +96,7 @@ class ProfileData extends React.Component {
     profile: "",
     errors: "",
   };
+  static contextType = UserContext;
   componentDidMount() {
     this.fetchData();
   }
@@ -142,7 +142,7 @@ class ProfileData extends React.Component {
           />
           <h2 className="text-2xl font-bold">{username}</h2>
           <p className="text-gray-400">{bio}</p>
-          {username === this.props.user.username ? (
+          {username === this.context.user.username ? (
             <SettingsButton />
           ) : (
             <FollowButton

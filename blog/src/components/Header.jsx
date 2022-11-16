@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 export default class Header extends React.Component {
   state = {
     menu: false,
   };
+  static contextType = UserContext;
   handleMenuUpdate = () => {
     this.setState({
       menu: !this.state.menu,
@@ -29,9 +31,8 @@ export default class Header extends React.Component {
               onClick={this.handleMenuUpdate}
             ></i>
 
-            {this.props.isLoggedIn ? (
+            {this.context.isLoggedIn ? (
               <AuthHeader
-                user={this.props.user}
                 handleMenuUpdate={this.handleMenuUpdate}
                 menu={menu}
               />
@@ -91,6 +92,7 @@ function NoAuthHeader(props) {
   );
 }
 function AuthHeader(props) {
+  let { user } = useContext(UserContext);
   return (
     <ul
       className={`text-lg lg:flex  ${
@@ -137,11 +139,11 @@ function AuthHeader(props) {
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink
-          to={`/profile/@${props.user.username}`}
+          to={`/profile/@${user.username}`}
           activeClassName="active-link"
         >
           <i className="fas fa-user px-2"></i>
-          <p className="inline-block">{props.user.username}</p>
+          <p className="inline-block">{user.username}</p>
         </NavLink>
       </li>
     </ul>

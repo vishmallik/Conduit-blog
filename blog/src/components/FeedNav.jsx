@@ -1,9 +1,12 @@
+import { useContext } from "react";
 import { Link } from "react-router-dom";
+import { UserContext } from "../context/UserContext";
 
 export default function FeedNav(props) {
+  let { isLoggedIn } = useContext(UserContext);
   return (
     <>
-      {props.isLoggedIn && (
+      {isLoggedIn && (
         <Link
           className={`mr-2 px-1  ${
             props.activeTab === "Your Feed" &&

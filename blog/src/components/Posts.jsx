@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
-import React from "react";
+import React, { useContext } from "react";
 import Loader from "./Loader";
+import { UserContext } from "../context/UserContext";
 
 export default function Posts(props) {
   let { articles, error } = props;
@@ -19,7 +20,6 @@ export default function Posts(props) {
       {articles.map((article) => (
         <Post
           article={article}
-          isLoggedIn={props.isLoggedIn}
           key={article.slug}
           handleFavorite={props.handleFavorite}
           updateActiveTab={props.updateActiveTab}
@@ -30,6 +30,7 @@ export default function Posts(props) {
 }
 
 function Post(props) {
+  let { isLoggedIn } = useContext(UserContext);
   let {
     author,
     createdAt,
@@ -62,7 +63,7 @@ function Post(props) {
             {new Date(createdAt).toDateString()}
           </p>
         </div>
-        {props.isLoggedIn ? (
+        {isLoggedIn ? (
           <button
             className={` basis-12 rounded-md border-2 border-amber-400
          py-1 ${favorited && "bg-red-200"}`}
