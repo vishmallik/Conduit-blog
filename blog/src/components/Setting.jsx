@@ -97,30 +97,26 @@ class Setting extends React.Component {
   render() {
     let { image, username, bio, email, password, errors } = this.state;
     return (
-      <div className="sm:container-md sm:w-1/2 container-mobile w-full">
+      <div className="sm:container-md container-mobile w-full sm:w-1/2">
         <form action="" className="my-4 flex flex-col" onSubmit={this.onSubmit}>
-          <label htmlFor="" className="text-3xl py-2 font-bold mx-auto">
+          <label htmlFor="" className="mx-auto py-2 text-3xl font-bold">
             Your Settings
           </label>
-          {this.state.errors.common ? (
-            <p className="text-red-500 font-bold text-center">
+          {this.state.errors.common && (
+            <p className="text-center font-bold text-red-500">
               {this.state.errors.common}
             </p>
-          ) : (
-            ""
           )}
-          {this.state.success ? (
-            <p className="text-green-500 font-bold text-center">
+          {this.state.success && (
+            <p className="text-center font-bold text-green-500">
               {this.state.success}
             </p>
-          ) : (
-            ""
           )}
           <input
             type="text"
             name="image"
             placeholder="URL of profile picture"
-            className=" px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400  focus:outline-blue-300"
+            className=" border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2  focus:outline-blue-300"
             value={image}
             onChange={this.onChange}
           />
@@ -128,7 +124,7 @@ class Setting extends React.Component {
             type="text"
             name="username"
             placeholder="Username"
-            className=" px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400 focus:outline-blue-300"
+            className=" border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300"
             value={username}
             onChange={this.onChange}
           />
@@ -137,7 +133,7 @@ class Setting extends React.Component {
             name="bio"
             placeholder="Short Bio about you"
             rows="10"
-            className=" px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400 focus:outline-blue-300"
+            className=" border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300"
             value={bio}
             onChange={this.onChange}
           ></textarea>
@@ -145,12 +141,12 @@ class Setting extends React.Component {
             type="text"
             name="email"
             placeholder="Email"
-            className=" px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400 focus:outline-blue-300"
+            className=" border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300"
             value={email}
             onChange={this.onChange}
           />
 
-          <span className="text-red-600 text-center text-sm">
+          <span className="text-center text-sm text-red-600">
             {errors.email}
           </span>
 
@@ -158,20 +154,19 @@ class Setting extends React.Component {
             type="password"
             name="password"
             placeholder="New Password"
-            className=" px-6 py-2 my-2 rounded-md border-1 border-solid border-slate-400 focus:outline-blue-300"
+            className=" border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300"
             value={password}
             onChange={this.onChange}
           />
           <input
             type="submit"
             value="Update Settings"
-            className="bg-amber-500 sm:mr-0 sm:ml-auto px-6 py-2 mt-4 text-white
-        rounded-md text-lg cursor-pointer sm:inline-block block "
+            className="mt-4 block cursor-pointer rounded-md bg-amber-500 px-6 py-2 text-lg text-white sm:mr-0 sm:ml-auto sm:inline-block "
           />
         </form>
         <hr />
         <button
-          className="text-red-500 border-1 border-solid border-red-500 py-2 px-4 rounded-lg my-4 hover:bg-red-500 hover:text-white sm:inline-block block sm:w-auto w-full"
+          className="border-1 my-4 block w-full rounded-lg border-solid border-red-500 py-2 px-4 text-red-500 hover:bg-red-500 hover:text-white sm:inline-block sm:w-auto"
           onClick={this.handleLogout}
         >
           or click here to Logout

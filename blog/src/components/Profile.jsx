@@ -54,29 +54,27 @@ class Profile extends React.Component {
           handleFollow={this.props.handleFollow}
         />
 
-        <div className="sm:container-md sm:my-10 my-4 container-mobile sm:text-left min-h-screen">
+        <div className="sm:container-md container-mobile my-4 min-h-screen sm:my-10 sm:text-left">
           <span
-            className={`px-1 mr-2 hover:cursor-pointer  ${
-              this.state.activeTab === "author"
-                ? "border-solid border-b-2 border-amber-500 text-amber-500"
-                : ""
+            className={`mr-2 px-1 hover:cursor-pointer  ${
+              this.state.activeTab === "author" &&
+              "border-b-2 border-solid border-amber-500 text-amber-500"
             }`}
             onClick={() => this.updateActiveTab("author")}
           >
             My Articles
           </span>
           <span
-            className={`px-1 mr-2 hover:cursor-pointer ${
-              this.state.activeTab === "favorited"
-                ? "border-solid border-b-2 border-amber-500 text-amber-500"
-                : ""
+            className={`mr-2 px-1 hover:cursor-pointer ${
+              this.state.activeTab === "favorited" &&
+              "border-b-2 border-solid border-amber-500 text-amber-500"
             }`}
             onClick={() => this.updateActiveTab("favorited")}
           >
             Favorited Articles
           </span>
           {this.state.errors ? (
-            <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+            <p className="min-h-screen py-8 text-center text-2xl text-red-500">
               {this.state.errors}
             </p>
           ) : (
@@ -126,7 +124,7 @@ class ProfileData extends React.Component {
     let { image, username, bio } = this.state.profile;
     if (this.state.errors) {
       return (
-        <p className="text-red-500 text-center py-8 text-2xl min-h-screen">
+        <p className="min-h-screen py-8 text-center text-2xl text-red-500">
           {this.state.errors}
         </p>
       );
@@ -136,11 +134,11 @@ class ProfileData extends React.Component {
     }
     return (
       <div className="bg-gray-100 py-2">
-        <div className="container-md text-center w-1/2">
+        <div className="container-md w-1/2 text-center">
           <img
             src={image || "/images/smiley-cyrus.jpg"}
             alt={username}
-            className="rounded-full w-28 h-28 mx-auto my-4"
+            className="mx-auto my-4 h-28 w-28 rounded-full"
           />
           <h2 className="text-2xl font-bold">{username}</h2>
           <p className="text-gray-400">{bio}</p>
@@ -160,10 +158,10 @@ class ProfileData extends React.Component {
 function SettingsButton(props) {
   return (
     <button
-      className="px-2 border-1 border-solid
-   border-gray-500 text-gray-500 rounded-md
-    my-2 sm:ml-auto sm:mr-0  hover:bg-amber-300
-     hover:text-white sm:block"
+      className="border-1 my-2 rounded-md
+   border-solid border-gray-500 px-2
+    text-gray-500 hover:bg-amber-300 hover:text-white  sm:ml-auto
+     sm:mr-0 sm:block"
     >
       {" "}
       <Link to="/settings">
@@ -175,10 +173,10 @@ function SettingsButton(props) {
 function FollowButton(props) {
   return (
     <button
-      className="px-2 border-1 border-solid
-             border-gray-500 text-gray-500 rounded-md
-              my-2 sm:ml-auto sm:mr-0 hover:bg-amber-300
-               hover:text-white sm:block"
+      className="border-1 my-2 rounded-md
+             border-solid border-gray-500 px-2
+              text-gray-500 hover:bg-amber-300 hover:text-white sm:ml-auto
+               sm:mr-0 sm:block"
       onClick={() => props.handleFollow("POST", props.username)}
     >
       {`+ Follow ${props.username}`}

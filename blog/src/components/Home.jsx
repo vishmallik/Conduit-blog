@@ -19,13 +19,13 @@ export default class Home extends React.Component {
 
   render() {
     return (
-      <main className="sm:container-md container-mobile sm:mx-auto mx-auto">
-        <div className="py-6 mx-auto text-center">
-          <h1 className="text-amber-400 font-black text-5xl py-4">Conduit</h1>
+      <main className="sm:container-md container-mobile mx-auto sm:mx-auto">
+        <div className="mx-auto py-6 text-center">
+          <h1 className="py-4 text-5xl font-black text-amber-400">Conduit</h1>
           <p className="text-xl">A place to share your knowledge</p>
         </div>
-        <div className="sm:flex flex-wrap">
-          <div className="xl:basis-3/4 basis-full">
+        <div className="flex-wrap sm:flex">
+          <div className="basis-full xl:basis-3/4">
             <FeedNav
               activeTab={this.props.activeTab}
               updateActiveTab={this.props.updateActiveTab}

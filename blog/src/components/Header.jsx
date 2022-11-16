@@ -13,18 +13,18 @@ export default class Header extends React.Component {
   render() {
     let { menu } = this.state;
     return (
-      <header className=" bg-amber-400">
+      <header className="bg-amber-400">
         <div
-          className="sm:container-md flex justify-between 
-      items-center sm:py-8 py-4 text-white container-mobile mx-auto "
+          className="sm:container-md container-mobile mx-auto 
+      flex items-center justify-between py-4 text-white sm:py-8 "
         >
           <Link to="/" className="text-4xl font-black">
             Conduit
           </Link>
           <nav>
             <i
-              className={`fas fa-bars text-white hover:text-red-400 text-xl lg:hidden cursor-pointer ${
-                menu ? "hidden" : ""
+              className={`fas fa-bars cursor-pointer text-xl text-white hover:text-red-400 lg:hidden ${
+                menu && "hidden"
               }`}
               onClick={this.handleMenuUpdate}
             ></i>
@@ -51,20 +51,20 @@ export default class Header extends React.Component {
 function NoAuthHeader(props) {
   return (
     <ul
-      className={`sm:flex text-lg  ${
+      className={`text-lg sm:flex  ${
         props.menu
-          ? "flex flex-col fixed top-0 left-0 right-0 text-center bottom-0 min-h-full bg-amber-400 text-2xl overflow-hidden pt-16 z-10"
+          ? "fixed top-0 left-0 right-0 bottom-0 z-10 flex min-h-full flex-col overflow-hidden bg-amber-400 pt-16 text-center text-2xl"
           : "hidden"
       }`}
     >
       <i
-        className={`fas fa-xmark sm:hidden cursor-pointer hover:text-red-400 text-white text-2xl z-20 absolute top-6 right-7 ${
+        className={`fas fa-xmark absolute top-6 right-7 z-20 cursor-pointer text-2xl text-white hover:text-red-400 sm:hidden ${
           props.menu ? "inline-block" : "hidden"
         }`}
         onClick={props.handleMenuUpdate}
       ></i>
       <li
-        className={`sm:px-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/" exact activeClassName="active-link">
@@ -72,7 +72,7 @@ function NoAuthHeader(props) {
         </NavLink>
       </li>
       <li
-        className={`sm:px-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/login" activeClassName="active-link">
@@ -80,7 +80,7 @@ function NoAuthHeader(props) {
         </NavLink>
       </li>
       <li
-        className={`sm:pl-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/register" activeClassName="active-link">
@@ -93,20 +93,20 @@ function NoAuthHeader(props) {
 function AuthHeader(props) {
   return (
     <ul
-      className={`lg:flex text-lg  ${
+      className={`text-lg lg:flex  ${
         props.menu
-          ? "flex flex-col fixed top-0 left-0 right-0 text-center bottom-0 min-h-full bg-amber-400 text-2xl overflow-hidden pt-16 z-10"
+          ? "fixed top-0 left-0 right-0 bottom-0 z-10 flex min-h-full flex-col overflow-hidden bg-amber-400 pt-16 text-center text-2xl"
           : "hidden"
       }`}
     >
       <i
-        className={`fas fa-xmark sm:hidden cursor-pointer hover:text-red-400 text-white text-xl z-20 absolute top-6 right-7 ${
+        className={`fas fa-xmark absolute top-6 right-7 z-20 cursor-pointer text-xl text-white hover:text-red-400 sm:hidden ${
           props.menu ? "inline-block" : "hidden"
         }`}
         onClick={props.handleMenuUpdate}
       ></i>
       <li
-        className={`sm:px-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/" exact activeClassName="active-link">
@@ -115,7 +115,7 @@ function AuthHeader(props) {
         </NavLink>
       </li>
       <li
-        className={`sm:px-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/editor" activeClassName="active-link">
@@ -124,7 +124,7 @@ function AuthHeader(props) {
         </NavLink>
       </li>
       <li
-        className={`sm:pl-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink to="/settings" activeClassName="active-link">
@@ -133,7 +133,7 @@ function AuthHeader(props) {
         </NavLink>
       </li>
       <li
-        className={`sm:pl-4 hover:text-orange-700 ${props.menu ? "py-4" : ""}`}
+        className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
         onClick={props.menu ? props.handleMenuUpdate : null}
       >
         <NavLink
