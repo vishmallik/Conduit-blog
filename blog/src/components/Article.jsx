@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, withRouter } from "react-router-dom";
-import { articlesURL } from "../utils/urls";
+import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
 import Comments from "./Comments";
 import remarkGfm from "remark-gfm";
@@ -16,6 +16,9 @@ class Article extends React.Component {
 
   componentDidMount() {
     //fetch article
+    this.fetchAllArticles();
+  }
+  fetchAllArticles = () => {
     this.fetchData("GET")
       .then((data) => {
         this.setState({
@@ -27,7 +30,7 @@ class Article extends React.Component {
           errors: "Unable to fetch article!!!",
         });
       });
-  }
+  };
 
   fetchData = (verb, headers = false, body) => {
     let slug = this.props.match.params.slug;
@@ -49,6 +52,39 @@ class Article extends React.Component {
       }
       return res.json();
     });
+  };
+  handleFavorite = (verb, slug) => {
+    fetch(articlesURL + `/${slug}/favorite`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        this.fetchAllArticles();
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete favorite request" })
+      );
+  };
+  handleFollow = (verb, username) => {
+    fetch(profileURL + `/${username}/follow`, {
+      method: verb,
+      headers: {
+        authorization: `Token ${this.context.user.token}`,
+      },
+    })
+      .then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+      })
+      .catch((errors) =>
+        this.setState({ errors: "Unable to complete follow request" })
+      );
   };
   handleDelete = () => {
     this.fetchData("DELETE", true)
@@ -109,9 +145,9 @@ class Article extends React.Component {
                   />
                 ) : (
                   <OtherUserButtons
-                    handleFollow={this.props.handleFollow}
                     article={article}
-                    handleFavorite={this.props.handleFavorite}
+                    handleFavorite={this.handleFavorite}
+                    handleFollow={this.handleFollow}
                   />
                 )
               ) : (
