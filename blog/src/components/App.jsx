@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Article from "./Article";
 import Error from "./Error";
@@ -14,28 +14,23 @@ import Profile from "./Profile";
 import Footer from "./Footer";
 import { UserContext } from "../context/UserContext";
 
-export default class App extends React.Component {
-  state = {
-    isLoggedIn: false,
-    user: null,
-    isVerifying: true,
-    errors: "",
-  };
-  updateUser = (user) => {
-    this.setState({
-      isLoggedIn: true,
-      user,
-      isVerifying: false,
-    });
-    localStorage.setItem(localStorageKey, user.token);
-  };
-  updateIsLoggedIn = () => {
-    this.setState({
-      isLoggedIn: false,
-    });
-  };
+export default function App() {
+  let [isLoggedIn, setIsLoggedIn] = useState(false);
+  let [user, setUser] = useState(null);
+  let [isVerifying, setIsVerifying] = useState(true);
+  let [errors, setErrors] = useState("");
 
-  componentDidMount = () => {
+  function updateUser(user) {
+    setIsLoggedIn(true);
+    setUser(user);
+    setIsVerifying(false);
+    localStorage.setItem(localStorageKey, user.token);
+  }
+  function updateIsLoggedIn() {
+    setIsLoggedIn(false);
+  }
+
+  useEffect(() => {
     let key = localStorage[localStorageKey];
     if (key) {
       fetch(verifyURL, {
@@ -48,43 +43,39 @@ export default class App extends React.Component {
           return res.json();
         })
         .then(({ user }) => {
-          this.updateUser(user);
+          updateUser(user);
         })
         .catch((error) => {
-          this.setState({ errors: "Can't Verify User" });
+          setErrors("Can't Verify User");
         });
     } else {
-      this.setState({ isVerifying: false });
+      setIsVerifying(false);
     }
-  };
+  }, []);
 
-  render() {
-    if (this.state.isVerifying) {
-      return <LoaderFull />;
-    }
-    return (
-      <BrowserRouter>
-        <UserContext.Provider
-          value={{ isLoggedIn: this.state.isLoggedIn, user: this.state.user }}
-        >
-          <Header />
-          {this.state.errors ? (
-            <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-              {this.state.errors}
-            </p>
-          ) : this.state.isLoggedIn ? (
-            <AuthenticatedApp
-              updateUser={this.updateUser}
-              updateIsLoggedIn={this.updateIsLoggedIn}
-            />
-          ) : (
-            <UnAuthenticatedApp updateUser={this.updateUser} />
-          )}
-          <Footer />
-        </UserContext.Provider>
-      </BrowserRouter>
-    );
+  if (isVerifying) {
+    return <LoaderFull />;
   }
+  return (
+    <BrowserRouter>
+      <UserContext.Provider value={{ isLoggedIn: isLoggedIn, user: user }}>
+        <Header />
+        {errors ? (
+          <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+            {errors}
+          </p>
+        ) : isLoggedIn ? (
+          <AuthenticatedApp
+            updateUser={updateUser}
+            updateIsLoggedIn={updateIsLoggedIn}
+          />
+        ) : (
+          <UnAuthenticatedApp updateUser={updateUser} />
+        )}
+        <Footer />
+      </UserContext.Provider>
+    </BrowserRouter>
+  );
 }
 
 function AuthenticatedApp(props) {

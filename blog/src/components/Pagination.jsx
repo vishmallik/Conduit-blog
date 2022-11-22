@@ -1,6 +1,10 @@
 export default function Pagination(props) {
-  let { articlesCount, articlesPerPage, currentPageIndex, updatePageIndex } =
-    props;
+  let {
+    articlesCount,
+    articlesPerPage,
+    currentPageIndex,
+    setCurrentPageIndex,
+  } = props;
   let pageArray = [];
   let pages = Math.ceil(articlesCount / articlesPerPage);
   for (let i = 1; i <= pages; i++) {
@@ -14,7 +18,7 @@ export default function Pagination(props) {
         border-2 border-solid 
         border-orange-400 hover:bg-orange-300`}
         onClick={() =>
-          updatePageIndex(currentPageIndex <= 1 ? 1 : currentPageIndex - 1)
+          setCurrentPageIndex(currentPageIndex <= 1 ? 1 : currentPageIndex - 1)
         }
       >
         Prev
@@ -26,7 +30,7 @@ export default function Pagination(props) {
           cursor-pointer items-center justify-center rounded-sm border-2
            border-solid border-orange-400 hover:bg-orange-300 
         ${currentPageIndex === page && "bg-orange-400"}`}
-          onClick={() => updatePageIndex(page)}
+          onClick={() => setCurrentPageIndex(page)}
         >
           {page}
         </li>
@@ -37,7 +41,7 @@ export default function Pagination(props) {
         border-2 border-solid 
         border-orange-400 hover:bg-orange-300`}
         onClick={() =>
-          updatePageIndex(
+          setCurrentPageIndex(
             currentPageIndex < pages ? currentPageIndex + 1 : currentPageIndex
           )
         }

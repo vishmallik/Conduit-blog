@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
 import FeedNav from "./FeedNav";
@@ -6,64 +6,53 @@ import Pagination from "./Pagination";
 import Posts from "./Posts";
 import SideBar from "./SideBar";
 
-export default class Home extends React.Component {
-  state = {
-    articles: null,
-    error: "",
-    articlesPerPage: 10,
-    articlesCount: 0,
-    currentPageIndex: 1,
-    activeTab: "",
-  };
-  static contextType = UserContext;
-  componentDidMount() {
-    this.setState(
-      {
-        activeTab: "Your Feed",
-      },
-      () => this.fetchData()
-    );
-  }
-  componentDidUpdate(prevProps, prevState) {
-    if (
-      prevState.currentPageIndex !== this.state.currentPageIndex ||
-      prevState.activeTab !== this.state.activeTab
-    ) {
-      this.fetchData();
+export default function Home() {
+  let { user, isLoggedIn } = useContext(UserContext);
+  let [articles, setArticles] = useState(null);
+  let [articlesPerPage, setArticlesPerPage] = useState(10);
+  let [articlesCount, setArticlesCount] = useState(0);
+  let [currentPageIndex, setCurrentPageIndex] = useState(1);
+  let [activeTab, setActiveTab] = useState(() => {
+    if (isLoggedIn) {
+      return "Your Feed";
+    } else {
+      return "";
     }
-  }
-  handleFavorite = (verb, slug) => {
+  });
+  let [error, setError] = useState("");
+  useEffect(() => {
+    fetchData();
+  }, [activeTab, currentPageIndex]);
+  function handleFavorite(verb, slug) {
     fetch(articlesURL + `/${slug}/favorite`, {
       method: verb,
       headers: {
-        authorization: `Token ${this.context.user.token}`,
+        authorization: `Token ${user.token}`,
       },
     })
       .then((res) => {
         if (!res.ok) {
           return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        this.fetchData();
+        fetchData();
       })
-      .catch((errors) =>
-        this.setState({ errors: "Unable to complete favorite request" })
-      );
-  };
+      .catch((errors) => setError("Unable to complete favorite request"));
+  }
 
-  fetchData = () => {
-    let limit = this.state.articlesPerPage;
-    let offset = (this.state.currentPageIndex - 1) * limit;
-    let tag = this.state.activeTab;
+  function fetchData() {
+    let limit = articlesPerPage;
+    let offset = (currentPageIndex - 1) * limit;
+    let tag = activeTab;
 
     fetch(
       articlesURL +
-        (this.state.activeTab === "Your Feed" ? "/feed" : "") +
+        (activeTab === "Your Feed" ? "/feed" : "") +
         `?limit=${limit}&offset=${offset}` +
         (tag && `&tag=${tag}`),
       {
-        headers: this.context.isLoggedIn
+        headers: isLoggedIn
           ? {
-              Authorization: `Token ${this.context.user.token}`,
+              Authorization: `Token ${user.token}`,
             }
           : {},
       }
@@ -74,64 +63,39 @@ export default class Home extends React.Component {
         }
         return res.json();
       })
-      .then((data) => {
-        this.setState({
-          articles: data.articles,
-          articlesCount: data.articlesCount,
-        });
+      .then(({ articles, articlesCount }) => {
+        setArticles(articles);
+        setArticlesCount(articlesCount);
       })
       .catch((err) => {
-        this.setState({ error: "Unable to fetch data!!!" });
+        setError("Unable to fetch data!!!");
       });
-  };
-  updatePageIndex = (index) => {
-    this.setState({
-      currentPageIndex: index,
-    });
-  };
-  updateActiveTab = (tag) => {
-    this.setState({
-      activeTab: tag,
-    });
-  };
-
-  render() {
-    let {
-      articles,
-      error,
-      articlesPerPage,
-      articlesCount,
-      currentPageIndex,
-      activeTab,
-    } = this.state;
-    return (
-      <main className="sm:container-md container-mobile mx-auto sm:mx-auto">
-        <div className="mx-auto py-6 text-center">
-          <h1 className="py-4 text-5xl font-black text-amber-400">Conduit</h1>
-          <p className="text-xl">A place to share your knowledge</p>
-        </div>
-        <div className="flex-wrap sm:flex">
-          <div className="basis-full xl:basis-3/4">
-            <FeedNav
-              activeTab={activeTab}
-              updateActiveTab={this.updateActiveTab}
-            />
-            <Posts
-              articles={articles}
-              error={error}
-              updateActiveTab={this.updateActiveTab}
-              handleFavorite={this.handleFavorite}
-            />
-            <Pagination
-              articlesCount={articlesCount}
-              articlesPerPage={articlesPerPage}
-              currentPageIndex={currentPageIndex}
-              updatePageIndex={this.updatePageIndex}
-            />
-          </div>
-          <SideBar updateActiveTab={this.updateActiveTab} />
-        </div>
-      </main>
-    );
   }
+
+  return (
+    <main className="sm:container-md container-mobile mx-auto sm:mx-auto">
+      <div className="mx-auto py-6 text-center">
+        <h1 className="py-4 text-5xl font-black text-amber-400">Conduit</h1>
+        <p className="text-xl">A place to share your knowledge</p>
+      </div>
+      <div className="flex-wrap sm:flex">
+        <div className="basis-full xl:basis-3/4">
+          <FeedNav activeTab={activeTab} setActiveTab={setActiveTab} />
+          <Posts
+            articles={articles}
+            error={error}
+            setActiveTab={setActiveTab}
+            handleFavorite={handleFavorite}
+          />
+          <Pagination
+            articlesCount={articlesCount}
+            articlesPerPage={articlesPerPage}
+            currentPageIndex={currentPageIndex}
+            setCurrentPageIndex={setCurrentPageIndex}
+          />
+        </div>
+        <SideBar setActiveTab={setActiveTab} />
+      </div>
+    </main>
+  );
 }
