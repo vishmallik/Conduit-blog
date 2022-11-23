@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Article from "./Article";
 import Error from "./Error";
 import Header from "./Header";
-import Home from "./Home";
-import Login from "./Login";
-import Register from "./Register";
 import { localStorageKey, verifyURL } from "../utils/urls";
 import LoaderFull from "./Loader Full";
-import NewPost from "./NewPost";
-import Setting from "./Setting";
-import Profile from "./Profile";
 import Footer from "./Footer";
 import { UserContext } from "../context/UserContext";
+const Home = React.lazy(() => import("./Home"));
+const Article = React.lazy(() => import("./Article"));
+const NewPost = React.lazy(() => import("./NewPost"));
+const Setting = React.lazy(() => import("./Setting"));
+const Profile = React.lazy(() => import("./Profile"));
+const Login = React.lazy(() => import("./Login"));
+const Register = React.lazy(() => import("./Register"));
 
 export default function App() {
   let [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -25,9 +25,6 @@ export default function App() {
     setUser(user);
     setIsVerifying(false);
     localStorage.setItem(localStorageKey, user.token);
-  }
-  function updateIsLoggedIn() {
-    setIsLoggedIn(false);
   }
 
   useEffect(() => {
@@ -59,20 +56,22 @@ export default function App() {
   return (
     <BrowserRouter>
       <UserContext.Provider value={{ isLoggedIn: isLoggedIn, user: user }}>
-        <Header />
-        {errors ? (
-          <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-            {errors}
-          </p>
-        ) : isLoggedIn ? (
-          <AuthenticatedApp
-            updateUser={updateUser}
-            updateIsLoggedIn={updateIsLoggedIn}
-          />
-        ) : (
-          <UnAuthenticatedApp updateUser={updateUser} />
-        )}
-        <Footer />
+        <Suspense fallback={<LoaderFull />}>
+          <Header />
+          {errors ? (
+            <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+              {errors}
+            </p>
+          ) : isLoggedIn ? (
+            <AuthenticatedApp
+              updateUser={updateUser}
+              setIsLoggedIn={setIsLoggedIn}
+            />
+          ) : (
+            <UnAuthenticatedApp updateUser={updateUser} />
+          )}
+          <Footer />
+        </Suspense>
       </UserContext.Provider>
     </BrowserRouter>
   );
@@ -90,7 +89,7 @@ function AuthenticatedApp(props) {
       <Route path="/settings">
         <Setting
           updateUser={props.updateUser}
-          updateIsLoggedIn={props.updateIsLoggedIn}
+          setIsLoggedIn={props.setIsLoggedIn}
         />
       </Route>
       <Route path="/profile/@:username">

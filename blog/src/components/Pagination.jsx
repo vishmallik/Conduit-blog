@@ -1,4 +1,6 @@
-export default function Pagination(props) {
+import React from "react";
+
+function Pagination(props) {
   let {
     articlesCount,
     articlesPerPage,
@@ -51,3 +53,4 @@ export default function Pagination(props) {
     </ul>
   );
 }
+export default React.memo(Pagination);

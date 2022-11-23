@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Link, withRouter } from "react-router-dom";
 import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
@@ -12,15 +12,32 @@ function Article(props) {
   let [error, setError] = useState("");
   let { user } = useContext(UserContext);
 
-  // componentDidMount() {
-  //   //fetch article
-  //   fetchAllArticles();
-  // }
-  useEffect(() => {
-    fetchArticle();
-  }, [article]);
+  const fetchData = useCallback(
+    (verb, headers = false, body) => {
+      let slug = props.match.params.slug;
+      return fetch(articlesURL + "/" + slug, {
+        method: verb,
+        headers: headers
+          ? {
+              authorization: `Token ${user.token}`,
+              "Content-Type": "application/json",
+            }
+          : {},
+        body: JSON.stringify(body),
+      }).then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        if (res.statusText === "No Content") {
+          return null;
+        }
+        return res.json();
+      });
+    },
+    [props.match.params.slug, user.token]
+  );
 
-  function fetchArticle() {
+  useEffect(() => {
     fetchData("GET")
       .then(({ article }) => {
         setArticle(article);
@@ -28,29 +45,8 @@ function Article(props) {
       .catch((err) => {
         setError("Unable to fetch article!!!");
       });
-  }
+  }, [article, fetchData]);
 
-  function fetchData(verb, headers = false, body) {
-    let slug = props.match.params.slug;
-    return fetch(articlesURL + "/" + slug, {
-      method: verb,
-      headers: headers
-        ? {
-            authorization: `Token ${user.token}`,
-            "Content-Type": "application/json",
-          }
-        : {},
-      body: JSON.stringify(body),
-    }).then((res) => {
-      if (!res.ok) {
-        return res.json().then(({ errors }) => Promise.reject(errors));
-      }
-      if (res.statusText === "No Content") {
-        return null;
-      }
-      return res.json();
-    });
-  }
   function handleFavorite(verb, slug) {
     fetch(articlesURL + `/${slug}/favorite`, {
       method: verb,

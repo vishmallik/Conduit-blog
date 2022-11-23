@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
 import FeedNav from "./FeedNav";
@@ -6,10 +6,10 @@ import Pagination from "./Pagination";
 import Posts from "./Posts";
 import SideBar from "./SideBar";
 
-export default function Home() {
+function Home() {
+  const articlesPerPage = 10;
   let { user, isLoggedIn } = useContext(UserContext);
   let [articles, setArticles] = useState(null);
-  let [articlesPerPage, setArticlesPerPage] = useState(10);
   let [articlesCount, setArticlesCount] = useState(0);
   let [currentPageIndex, setCurrentPageIndex] = useState(1);
   let [activeTab, setActiveTab] = useState(() => {
@@ -20,9 +20,7 @@ export default function Home() {
     }
   });
   let [error, setError] = useState("");
-  useEffect(() => {
-    fetchData();
-  }, [activeTab, currentPageIndex]);
+
   function handleFavorite(verb, slug) {
     fetch(articlesURL + `/${slug}/favorite`, {
       method: verb,
@@ -38,12 +36,10 @@ export default function Home() {
       })
       .catch((errors) => setError("Unable to complete favorite request"));
   }
-
-  function fetchData() {
+  const fetchData = useCallback(() => {
     let limit = articlesPerPage;
     let offset = (currentPageIndex - 1) * limit;
     let tag = activeTab;
-
     fetch(
       articlesURL +
         (activeTab === "Your Feed" ? "/feed" : "") +
@@ -70,7 +66,11 @@ export default function Home() {
       .catch((err) => {
         setError("Unable to fetch data!!!");
       });
-  }
+  }, [articlesPerPage, currentPageIndex, activeTab, isLoggedIn, user.token]);
+
+  useEffect(() => {
+    fetchData();
+  }, [activeTab, currentPageIndex, fetchData]);
 
   return (
     <main className="sm:container-md container-mobile mx-auto sm:mx-auto">
@@ -99,3 +99,4 @@ export default function Home() {
     </main>
   );
 }
+export default React.memo(Home);
