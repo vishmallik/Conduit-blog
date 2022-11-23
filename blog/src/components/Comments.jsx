@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
@@ -11,38 +11,37 @@ export default function Comments(props) {
 
   let { user, isLoggedIn } = useContext(UserContext);
 
-  useEffect(() => {
-    fetchAllComments();
-  }, [allComments]);
+  const fetchData = useCallback(
+    (verb, headers = false, id = "", body) => {
+      return fetch(articlesURL + `/${props.slug}/comments/${id}`, {
+        method: verb,
+        headers: headers
+          ? {
+              authorization: `Token ${user.token}`,
+              "Content-Type": "application/json",
+            }
+          : {},
+        body: JSON.stringify(body),
+      }).then((res) => {
+        if (!res.ok) {
+          return res.json().then(({ errors }) => Promise.reject(errors));
+        }
+        if (res.statusText === "No Content") {
+          return null;
+        }
+        return res.json();
+      });
+    },
+    [props.slug, user.token]
+  );
 
-  function fetchData(verb, headers = false, id = "", body) {
-    return fetch(articlesURL + `/${props.slug}/comments/${id}`, {
-      method: verb,
-      headers: headers
-        ? {
-            authorization: `Token ${user.token}`,
-            "Content-Type": "application/json",
-          }
-        : {},
-      body: JSON.stringify(body),
-    }).then((res) => {
-      if (!res.ok) {
-        return res.json().then(({ errors }) => Promise.reject(errors));
-      }
-      if (res.statusText === "No Content") {
-        return null;
-      }
-      return res.json();
-    });
-  }
-
-  function fetchAllComments() {
+  const fetchAllComments = useCallback(() => {
     fetchData("GET")
       .then(({ comments }) => {
         setAllComments(comments);
       })
       .catch((errors) => setErrors("Couldn't Fetch comments"));
-  }
+  }, [fetchData]);
 
   function handleDeleteComment(id) {
     fetchData("DELETE", true, id)
@@ -64,6 +63,9 @@ export default function Comments(props) {
       })
       .catch((errors) => setErrors("Couldn't Post comments"));
   }
+  useEffect(() => {
+    fetchAllComments();
+  }, [allComments, fetchAllComments]);
 
   return (
     <footer>
