@@ -66,7 +66,7 @@ function Home() {
       .catch((err) => {
         setError("Unable to fetch data!!!");
       });
-  }, [articlesPerPage, currentPageIndex, activeTab, isLoggedIn, user.token]);
+  }, [articlesPerPage, currentPageIndex, activeTab, isLoggedIn]);
 
   useEffect(() => {
     fetchData();

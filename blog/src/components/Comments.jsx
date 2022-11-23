@@ -32,7 +32,7 @@ export default function Comments(props) {
         return res.json();
       });
     },
-    [props.slug, user.token]
+    [props.slug]
   );
 
   const fetchAllComments = useCallback(() => {
