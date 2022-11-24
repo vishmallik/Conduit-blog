@@ -14,7 +14,7 @@ export default function FeedNav(props) {
           }`}
           to="/"
           onClick={() => {
-            props.updateActiveTab("Your Feed");
+            props.setActiveTab("Your Feed");
           }}
         >
           Your Feed
@@ -28,7 +28,7 @@ export default function FeedNav(props) {
         }`}
         to="/"
         onClick={() => {
-          props.updateActiveTab("");
+          props.setActiveTab("");
         }}
       >
         Global Feed

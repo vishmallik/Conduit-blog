@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { withRouter } from "react-router";
 import { Link } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
@@ -6,190 +6,157 @@ import { articlesURL, profileURL } from "../utils/urls";
 import Loader from "./Loader";
 import Posts from "./Posts";
 
-class Profile extends React.Component {
-  state = {
-    activeTab: "author",
-    articles: [],
-    errors: "",
-  };
-  static contextType = UserContext;
-  updateActiveTab = (tab) => {
-    this.setState(
-      {
-        activeTab: tab,
-      },
-      () => this.fetchData()
-    );
-  };
-  componentDidUpdate(prevProps) {
-    if (prevProps.match.params.username !== this.props.match.params.username) {
-      this.fetchData();
+function Profile(props) {
+  let [activeTab, setActiveTab] = useState("author");
+  let [articles, setArticles] = useState(null);
+  let [errors, setErrors] = useState("");
+
+  let { user } = useContext(UserContext);
+
+  useEffect(() => {
+    function fetchData() {
+      fetch(articlesURL + `?${activeTab}=${props.match.params.username}`)
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then(({ errors }) => Promise.reject(errors));
+          }
+          return res.json();
+        })
+        .then(({ articles }) => {
+          setArticles(articles);
+        })
+        .catch((errors) => setErrors("Unable to fetch Article!!!"));
     }
-  }
-  componentDidMount() {
-    this.fetchData();
-  }
-  fetchData = () => {
-    fetch(
-      articlesURL +
-        `?${this.state.activeTab}=${this.props.match.params.username}`
-    )
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then(({ errors }) => Promise.reject(errors));
-        }
-        return res.json();
-      })
-      .then(({ articles }) => {
-        this.setState({ articles });
-      })
-      .catch((errors) =>
-        this.setState({ errors: "Unable to fetch Article!!!" })
-      );
-  };
-  handleFavorite = (verb, slug) => {
+    fetchData();
+  }, [props.match.params.username, activeTab]);
+
+  function handleFavorite(verb, slug) {
     fetch(articlesURL + `/${slug}/favorite`, {
       method: verb,
       headers: {
-        authorization: `Token ${this.context.user.token}`,
+        authorization: `Token ${user.token}`,
       },
     })
       .then((res) => {
         if (!res.ok) {
           return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        this.fetchData();
       })
-      .catch((errors) =>
-        this.setState({ errors: "Unable to complete favorite request" })
-      );
-  };
-
-  render() {
-    return (
-      <>
-        <ProfileData username={this.props.match.params.username} />
-
-        <div className="sm:container-md container-mobile my-4 min-h-screen sm:my-10 sm:text-left">
-          <span
-            className={`mr-2 px-1 hover:cursor-pointer  ${
-              this.state.activeTab === "author" &&
-              "border-b-2 border-solid border-amber-500 text-amber-500"
-            }`}
-            onClick={() => this.updateActiveTab("author")}
-          >
-            My Articles
-          </span>
-          <span
-            className={`mr-2 px-1 hover:cursor-pointer ${
-              this.state.activeTab === "favorited" &&
-              "border-b-2 border-solid border-amber-500 text-amber-500"
-            }`}
-            onClick={() => this.updateActiveTab("favorited")}
-          >
-            Favorited Articles
-          </span>
-          {this.state.errors ? (
-            <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-              {this.state.errors}
-            </p>
-          ) : (
-            <div>
-              <Posts
-                articles={this.state.articles}
-                handleFavorite={this.handleFavorite}
-              />
-            </div>
-          )}
-        </div>
-      </>
-    );
+      .catch((errors) => setErrors("Unable to complete favorite request"));
   }
+
+  return (
+    <>
+      <ProfileData username={props.match.params.username} />
+      <div className="sm:container-md container-mobile my-4 min-h-screen sm:my-10 sm:text-left">
+        <span
+          className={`mr-2 px-1 hover:cursor-pointer ${
+            activeTab === "author" &&
+            "border-b-2 border-solid border-amber-500 text-amber-500"
+          }`}
+          onClick={() => setActiveTab("author")}
+        >
+          My Articles
+        </span>
+        <span
+          className={`mr-2 px-1 hover:cursor-pointer ${
+            activeTab === "favorited" &&
+            "border-b-2 border-solid border-amber-500 text-amber-500"
+          }`}
+          onClick={() => setActiveTab("favorited")}
+        >
+          Favorited Articles
+        </span>
+        {errors ? (
+          <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+            {errors}
+          </p>
+        ) : (
+          <div>
+            <Posts articles={articles} handleFavorite={handleFavorite} />
+          </div>
+        )}
+      </div>
+    </>
+  );
 }
 
-class ProfileData extends React.Component {
-  state = {
-    profile: "",
-    following: false,
-    errors: "",
-  };
-  static contextType = UserContext;
-  handleFollow = (verb, username) => {
+function ProfileData(props) {
+  let [profile, setProfile] = useState("");
+  let [following, setFollowing] = useState(false);
+  let [errors, setErrors] = useState("");
+  let { user } = useContext(UserContext);
+
+  function handleFollow(verb, username) {
     fetch(profileURL + `/${username}/follow`, {
       method: verb,
       headers: {
-        authorization: `Token ${this.context.user.token}`,
+        authorization: `Token ${user.token}`,
       },
     })
       .then((res) => {
         if (!res.ok) {
           return res.json().then(({ errors }) => Promise.reject(errors));
         }
-        this.setState({ following: !this.state.following });
+        setFollowing(!following);
       })
-      .catch((errors) =>
-        this.setState({ errors: "Unable to complete follow request" })
-      );
-  };
-  componentDidMount() {
-    this.fetchData();
+      .catch((errors) => setErrors("Unable to complete follow request"));
   }
-  componentDidUpdate(prevProps, prevState) {
-    if (this.props.username !== prevProps.username) {
-      this.fetchData();
-    }
-  }
-  fetchData = () => {
-    fetch(profileURL + `/${this.props.username}`, {
-      method: "GET",
-    })
-      .then((res) => {
-        if (!res.ok) {
-          return res.json().then(({ errors }) => Promise.reject(errors));
-        }
-        return res.json();
+
+  useEffect(() => {
+    function fetchData() {
+      fetch(profileURL + `/${props.username}`, {
+        method: "GET",
       })
-      .then(({ profile }) => this.setState({ profile }))
-      .catch((errors) => {
-        this.setState({ errors: "Unable to fetch Profile" });
-      });
-  };
-  render() {
-    let { image, username, bio } = this.state.profile;
-    if (this.state.errors) {
-      return (
-        <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-          {this.state.errors}
-        </p>
-      );
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then(({ errors }) => Promise.reject(errors));
+          }
+          return res.json();
+        })
+        .then(({ profile }) => setProfile(profile))
+        .catch((errors) => {
+          setErrors("Unable to fetch Profile");
+        });
     }
-    if (!this.state.profile) {
-      return <Loader />;
-    }
+    fetchData();
+  }, [props.username]);
+
+  let { image, username, bio } = profile;
+  if (errors) {
     return (
-      <div className="bg-gray-100 py-2">
-        <div className="container-md w-1/2 text-center">
-          <img
-            src={image || "/images/smiley-cyrus.jpg"}
-            alt={username}
-            className="mx-auto my-4 h-28 w-28 rounded-full"
-          />
-          <h2 className="text-2xl font-bold">{username}</h2>
-          <p className="text-gray-400">{bio}</p>
-          {username === this.context.user.username ? (
-            <SettingsButton />
-          ) : (
-            <FollowButton
-              username={username}
-              handleFollow={this.handleFollow}
-              following={this.state.following}
-            />
-          )}
-        </div>
-      </div>
+      <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+        {errors}
+      </p>
     );
   }
+  if (!profile) {
+    return <Loader />;
+  }
+  return (
+    <div className="bg-gray-100 py-2">
+      <div className="container-md w-1/2 text-center">
+        <img
+          src={image || "/images/smiley-cyrus.jpg"}
+          alt={username}
+          className="mx-auto my-4 h-28 w-28 rounded-full"
+        />
+        <h2 className="text-2xl font-bold">{username}</h2>
+        <p className="text-gray-400">{bio}</p>
+        {username === user.username ? (
+          <SettingsButton />
+        ) : (
+          <FollowButton
+            username={username}
+            handleFollow={handleFollow}
+            following={following}
+          />
+        )}
+      </div>
+    </div>
+  );
 }
+
 function SettingsButton(props) {
   return (
     <button
@@ -223,4 +190,4 @@ function FollowButton(props) {
     </button>
   );
 }
-export default withRouter(Profile);
+export default withRouter(React.memo(Profile));
