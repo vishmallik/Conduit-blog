@@ -1,49 +1,71 @@
-import React from "react";
+import React, { useContext, useEffect, useReducer } from "react";
 import { withRouter } from "react-router";
 import { UserContext } from "../context/UserContext";
 import { articlesURL } from "../utils/urls";
 
-class NewPost extends React.Component {
-  state = {
+function reducer(state, action) {
+  switch (action.type) {
+    case "title":
+      return {
+        ...state,
+        title: action.payload,
+      };
+    case "description":
+      return {
+        ...state,
+        description: action.payload,
+      };
+    case "body":
+      return {
+        ...state,
+        body: action.payload,
+      };
+    case "tagList":
+      return {
+        ...state,
+        tagList: action.payload,
+      };
+    case "errors":
+      return {
+        ...state,
+        errors: action.payload,
+      };
+    default:
+      return state;
+  }
+}
+
+function NewPost(props) {
+  let [state, dispatch] = useReducer(reducer, {
     title: "",
     description: "",
     body: "",
     tagList: "",
-    errors: {
-      title: "",
-      description: "",
-      body: "",
-      tagList: "",
-      common: "",
-    },
-  };
-  static contextType = UserContext;
-  componentDidMount() {
-    if (this.props.location.state) {
-      let { title, description, body, tagList } =
-        this.props.location.state.article;
-      this.setState({
-        ...this.state,
-        title,
-        description,
-        body,
-        tagList,
-      });
+    errors: "",
+  });
+
+  let { user } = useContext(UserContext);
+  useEffect(() => {
+    if (props.location.state) {
+      let { title, description, body, tagList } = props.location.state.article;
+      dispatch({ type: "title", payload: title });
+      dispatch({ type: "description", payload: description });
+      dispatch({ type: "body", payload: body });
+      dispatch({ type: "tagList", payload: tagList });
     }
-  }
-  handleChange = ({ target }) => {
+  }, [props.location.state]);
+
+  function handleChange({ target }) {
     let { name, value } = target;
     if (name === "tagList") {
       value = value.split(",").map((tag) => tag.trim());
     }
+    dispatch({ type: name, payload: value });
+  }
 
-    this.setState({
-      [name]: value,
-    });
-  };
-  handleSubmit = (event) => {
+  function handleSubmit(event) {
     event.preventDefault();
-    let { title, description, body, tagList } = this.state;
+    let { title, description, body, tagList, errors } = state;
     let data = {
       article: {
         title,
@@ -53,31 +75,27 @@ class NewPost extends React.Component {
       },
     };
     if (!title) {
-      return this.setState({
-        errors: Object.assign(this.state.errors, {
-          title: "Title cant be empty",
-        }),
+      return dispatch({
+        type: "errors",
+        payload: { ...errors, title: "Title cant be empty" },
       });
     }
     if (!description) {
-      return this.setState({
-        errors: Object.assign(this.state.errors, {
-          description: "Description cant be empty",
-        }),
+      return dispatch({
+        type: "errors",
+        payload: { ...errors, description: "Description cant be empty" },
       });
     }
     if (!body) {
-      return this.setState({
-        errors: Object.assign(this.state.errors, {
-          body: "Body cant be empty",
-        }),
+      return dispatch({
+        type: "errors",
+        payload: { ...errors, body: "Body cant be empty" },
       });
     }
     if (!tagList) {
-      return this.setState({
-        errors: Object.assign(this.state.errors, {
-          tagList: "Tag List cant be empty",
-        }),
+      return dispatch({
+        type: "errors",
+        payload: { ...errors, tagList: "Tag List cant be empty" },
       });
     }
 
@@ -85,7 +103,7 @@ class NewPost extends React.Component {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Token ${this.context.user.token}`,
+        authorization: `Token ${user.token}`,
       },
       body: JSON.stringify(data),
     })
@@ -96,29 +114,19 @@ class NewPost extends React.Component {
         return res.json();
       })
       .then(({ article }) => {
-        this.setState({
-          errors: {
-            title: "",
-            description: "",
-            body: "",
-            tagList: "",
-            common: "",
-          },
-        });
-        this.props.history.push(`/article/${article.slug}`);
+        dispatch({ type: "errors", payload: "" });
+        props.history.push(`/article/${article.slug}`);
       })
       .catch((errors) =>
-        this.setState({
-          errors: {
-            ...errors,
-            common: "Unable to Create New Article!!!",
-          },
+        dispatch({
+          type: "errors",
+          payload: { ...errors, common: "Unable to Create New Article!!!" },
         })
       );
-  };
-  handleEdit = (event) => {
+  }
+  function handleEdit(event) {
+    let { title, description, body, tagList } = state;
     event.preventDefault();
-    let { title, description, body, tagList } = this.state;
     let data = {
       article: {
         title,
@@ -133,11 +141,11 @@ class NewPost extends React.Component {
       }
     });
 
-    fetch(articlesURL + `/${this.props.location.state.article.slug}`, {
+    fetch(articlesURL + `/${props.location.state.article.slug}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        authorization: `Token ${this.context.user.token}`,
+        authorization: `Token ${user.token}`,
       },
       body: JSON.stringify(data),
     })
@@ -148,101 +156,88 @@ class NewPost extends React.Component {
         return res.json();
       })
       .then(({ article }) => {
-        this.setState({
-          errors: {
-            title: "",
-            description: "",
-            body: "",
-            tagList: "",
-            common: "",
-          },
-        });
-        this.props.history.push(`/article/${article.slug}`);
+        dispatch({ type: "errors", payload: "" });
+        props.history.push(`/article/${article.slug}`);
       })
       .catch((errors) =>
-        this.setState({
-          errors: { ...errors, common: "Unable to Edit Article!!!" },
+        dispatch({
+          type: "errors",
+          payload: { ...state.errors, common: "Unable to Edit Article!!!" },
         })
       );
-  };
-  render() {
-    let { title, description, body, tagList, errors } = this.state;
-    if (errors.common) {
-      return (
-        <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-          {errors.common}
-        </p>
-      );
-    }
+  }
+
+  let { title, description, body, tagList, errors } = state;
+  if (errors.common) {
     return (
-      <form
-        action=""
-        className="sm:container-md container-mobile flex w-full flex-col pt-4 pb-20 sm:w-1/2"
-        onSubmit={
-          this.props.location.state ? this.handleEdit : this.handleSubmit
-        }
-      >
-        <input
-          type="text"
-          name="title"
-          placeholder="Article Title"
-          className={`border-1 my-2 mt-16 rounded-md border-solid border-slate-400 px-6
+      <p className="min-h-screen py-8 text-center text-2xl text-red-500">
+        {errors.common}
+      </p>
+    );
+  }
+  return (
+    <form
+      action=""
+      className="sm:container-md container-mobile flex w-full flex-col pt-4 pb-20 sm:w-1/2"
+      onSubmit={props.location.state ? handleEdit : handleSubmit}
+    >
+      <input
+        type="text"
+        name="title"
+        placeholder="Article Title"
+        className={`border-1 my-2 mt-16 rounded-md border-solid border-slate-400 px-6
            py-2 text-xl  focus:outline-blue-300 ${
              errors.title && "border-red-400"
            }`}
-          onChange={this.handleChange}
-          value={title}
-        />
-        <span className="mx-auto text-sm text-red-500">{errors.title}</span>
-        <input
-          type="text"
-          name="description"
-          placeholder="What's this article about?"
-          className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6
+        onChange={handleChange}
+        value={title}
+      />
+      <span className="mx-auto text-sm text-red-500">{errors.title}</span>
+      <input
+        type="text"
+        name="description"
+        placeholder="What's this article about?"
+        className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6
            py-2 focus:outline-blue-300 ${
              errors.description && "border-red-400"
            }`}
-          onChange={this.handleChange}
-          value={description}
-        />
-        <span className="mx-auto text-sm text-red-500">
-          {errors.description}
-        </span>
+        onChange={handleChange}
+        value={description}
+      />
+      <span className="mx-auto text-sm text-red-500">{errors.description}</span>
 
-        <textarea
-          type="text"
-          name="body"
-          placeholder="Write your article (in markdown)"
-          rows="10"
-          className={` border-1 my-2 rounded-md border-solid border-slate-400 px-6
+      <textarea
+        type="text"
+        name="body"
+        placeholder="Write your article (in markdown)"
+        rows="10"
+        className={` border-1 my-2 rounded-md border-solid border-slate-400 px-6
            py-2 focus:outline-blue-300 ${errors.body && "border-red-400"}`}
-          onChange={this.handleChange}
-          value={body}
-        ></textarea>
-        <span className="mx-auto text-sm text-red-500">{errors.body}</span>
+        onChange={handleChange}
+        value={body}
+      ></textarea>
+      <span className="mx-auto text-sm text-red-500">{errors.body}</span>
 
-        <input
-          type="text"
-          name="tagList"
-          placeholder="Enter Tags"
-          className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300 ${
-            errors.tagList && "border-red-400"
-          }`}
-          onChange={this.handleChange}
-          value={tagList}
-        />
-        <span className="mx-auto text-sm text-red-500">{errors.tagList}</span>
+      <input
+        type="text"
+        name="tagList"
+        placeholder="Enter Tags"
+        className={`border-1 my-2 rounded-md border-solid border-slate-400 px-6 py-2 focus:outline-blue-300 ${
+          errors.tagList && "border-red-400"
+        }`}
+        onChange={handleChange}
+        value={tagList}
+      />
+      <span className="mx-auto text-sm text-red-500">{errors.tagList}</span>
 
-        <input
-          type="submit"
-          value={
-            this.props.location.state ? "Update Article" : "Publish Article"
-          }
-          className="mt-4 block cursor-pointer rounded-md bg-amber-500 px-6 py-2
+      <input
+        type="submit"
+        value={props.location.state ? "Update Article" : "Publish Article"}
+        className="mt-4 block cursor-pointer rounded-md bg-amber-500 px-6 py-2
       text-lg text-white disabled:cursor-not-allowed disabled:bg-gray-400 sm:mr-0 sm:ml-auto sm:inline-block"
-        />
-      </form>
-    );
-  }
+      />
+    </form>
+  );
 }
+
 export default withRouter(NewPost);

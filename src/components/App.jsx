@@ -1,41 +1,33 @@
-import React from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-import Article from "./Article";
 import Error from "./Error";
 import Header from "./Header";
-import Home from "./Home";
-import Login from "./Login";
-import Register from "./Register";
 import { localStorageKey, verifyURL } from "../utils/urls";
 import LoaderFull from "./Loader Full";
-import NewPost from "./NewPost";
-import Setting from "./Setting";
-import Profile from "./Profile";
 import Footer from "./Footer";
 import { UserContext } from "../context/UserContext";
+const Home = React.lazy(() => import("./Home"));
+const Article = React.lazy(() => import("./Article"));
+const NewPost = React.lazy(() => import("./NewPost"));
+const Setting = React.lazy(() => import("./Setting"));
+const Profile = React.lazy(() => import("./Profile"));
+const Login = React.lazy(() => import("./Login"));
+const Register = React.lazy(() => import("./Register"));
 
-export default class App extends React.Component {
-  state = {
-    isLoggedIn: false,
-    user: null,
-    isVerifying: true,
-    errors: "",
-  };
-  updateUser = (user) => {
-    this.setState({
-      isLoggedIn: true,
-      user,
-      isVerifying: false,
-    });
+export default function App() {
+  let [isLoggedIn, setIsLoggedIn] = useState(false);
+  let [user, setUser] = useState(null);
+  let [isVerifying, setIsVerifying] = useState(true);
+  let [errors, setErrors] = useState("");
+
+  function updateUser(user) {
+    setIsLoggedIn(true);
+    setUser(user);
+    setIsVerifying(false);
     localStorage.setItem(localStorageKey, user.token);
-  };
-  updateIsLoggedIn = () => {
-    this.setState({
-      isLoggedIn: false,
-    });
-  };
+  }
 
-  componentDidMount = () => {
+  useEffect(() => {
     let key = localStorage[localStorageKey];
     if (key) {
       fetch(verifyURL, {
@@ -48,43 +40,41 @@ export default class App extends React.Component {
           return res.json();
         })
         .then(({ user }) => {
-          this.updateUser(user);
+          updateUser(user);
         })
         .catch((error) => {
-          this.setState({ errors: "Can't Verify User" });
+          setErrors("Can't Verify User");
         });
     } else {
-      this.setState({ isVerifying: false });
+      setIsVerifying(false);
     }
-  };
+  }, []);
 
-  render() {
-    if (this.state.isVerifying) {
-      return <LoaderFull />;
-    }
-    return (
-      <BrowserRouter>
-        <UserContext.Provider
-          value={{ isLoggedIn: this.state.isLoggedIn, user: this.state.user }}
-        >
+  if (isVerifying) {
+    return <LoaderFull />;
+  }
+  return (
+    <BrowserRouter>
+      <UserContext.Provider value={{ isLoggedIn: isLoggedIn, user: user }}>
+        <Suspense fallback={<LoaderFull />}>
           <Header />
-          {this.state.errors ? (
+          {errors ? (
             <p className="min-h-screen py-8 text-center text-2xl text-red-500">
-              {this.state.errors}
+              {errors}
             </p>
-          ) : this.state.isLoggedIn ? (
+          ) : isLoggedIn ? (
             <AuthenticatedApp
-              updateUser={this.updateUser}
-              updateIsLoggedIn={this.updateIsLoggedIn}
+              updateUser={updateUser}
+              setIsLoggedIn={setIsLoggedIn}
             />
           ) : (
-            <UnAuthenticatedApp updateUser={this.updateUser} />
+            <UnAuthenticatedApp updateUser={updateUser} />
           )}
           <Footer />
-        </UserContext.Provider>
-      </BrowserRouter>
-    );
-  }
+        </Suspense>
+      </UserContext.Provider>
+    </BrowserRouter>
+  );
 }
 
 function AuthenticatedApp(props) {
@@ -99,7 +89,7 @@ function AuthenticatedApp(props) {
       <Route path="/settings">
         <Setting
           updateUser={props.updateUser}
-          updateIsLoggedIn={props.updateIsLoggedIn}
+          setIsLoggedIn={props.setIsLoggedIn}
         />
       </Route>
       <Route path="/profile/@:username">

@@ -1,52 +1,37 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { UserContext } from "../context/UserContext";
 
-export default class Header extends React.Component {
-  state = {
-    menu: false,
-  };
-  static contextType = UserContext;
-  handleMenuUpdate = () => {
-    this.setState({
-      menu: !this.state.menu,
-    });
-  };
-  render() {
-    let { menu } = this.state;
-    return (
-      <header className="bg-amber-400">
-        <div
-          className="sm:container-md container-mobile mx-auto 
-      flex items-center justify-between py-4 text-white sm:py-8 "
-        >
-          <Link to="/" className="text-4xl font-black">
-            Conduit
-          </Link>
-          <nav>
-            <i
-              className={`fas fa-bars cursor-pointer text-xl text-white hover:text-red-400 lg:hidden ${
-                menu && "hidden"
-              }`}
-              onClick={this.handleMenuUpdate}
-            ></i>
+function Header() {
+  let [menu, setMenu] = useState(false);
+  let user = useContext(UserContext);
 
-            {this.context.isLoggedIn ? (
-              <AuthHeader
-                handleMenuUpdate={this.handleMenuUpdate}
-                menu={menu}
-              />
-            ) : (
-              <NoAuthHeader
-                handleMenuUpdate={this.handleMenuUpdate}
-                menu={menu}
-              />
-            )}
-          </nav>
-        </div>
-      </header>
-    );
-  }
+  return (
+    <header className="bg-amber-400">
+      <div
+        className="sm:container-md container-mobile mx-auto 
+      flex items-center justify-between py-4 text-white sm:py-8 "
+      >
+        <Link to="/" className="text-4xl font-black">
+          Conduit
+        </Link>
+        <nav>
+          <i
+            className={`fas fa-bars cursor-pointer text-xl text-white hover:text-red-400 lg:hidden ${
+              menu && "hidden"
+            }`}
+            onClick={() => setMenu(!menu)}
+          ></i>
+
+          {user.isLoggedIn ? (
+            <AuthHeader setMenu={setMenu} menu={menu} />
+          ) : (
+            <NoAuthHeader setMenu={setMenu} menu={menu} />
+          )}
+        </nav>
+      </div>
+    </header>
+  );
 }
 
 function NoAuthHeader(props) {
@@ -62,11 +47,11 @@ function NoAuthHeader(props) {
         className={`fas fa-xmark absolute top-6 right-7 z-20 cursor-pointer text-2xl text-white hover:text-red-400 sm:hidden ${
           props.menu ? "inline-block" : "hidden"
         }`}
-        onClick={props.handleMenuUpdate}
+        onClick={() => props.setMenu(!props.menu)}
       ></i>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/" exact activeClassName="active-link">
           Home
@@ -74,7 +59,7 @@ function NoAuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? props.setMenu(!props.menu) : null}
       >
         <NavLink to="/login" activeClassName="active-link">
           Sign In
@@ -82,7 +67,7 @@ function NoAuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? props.setMenu(!props.menu) : null}
       >
         <NavLink to="/register" activeClassName="active-link">
           Sign Up
@@ -105,11 +90,11 @@ function AuthHeader(props) {
         className={`fas fa-xmark absolute top-6 right-7 z-20 cursor-pointer text-xl text-white hover:text-red-400 sm:hidden ${
           props.menu ? "inline-block" : "hidden"
         }`}
-        onClick={props.handleMenuUpdate}
+        onClick={() => props.setMenu(!props.menu)}
       ></i>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/" exact activeClassName="active-link">
           <i className="fas fa-home px-2"></i>
@@ -118,7 +103,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/editor" activeClassName="active-link">
           <i className="fas fa-pen-to-square  px-2"></i>
@@ -127,7 +112,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/settings" activeClassName="active-link">
           <i className="fas fa-gear  px-2"></i>
@@ -136,7 +121,7 @@ function AuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.handleMenuUpdate : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink
           to={`/profile/@${user.username}`}
@@ -149,3 +134,4 @@ function AuthHeader(props) {
     </ul>
   );
 }
+export default React.memo(Header);
