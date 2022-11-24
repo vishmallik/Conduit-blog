@@ -1,70 +1,77 @@
-# Getting Started with Create React App
+# 📝 Conduit Blog App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A Medium Clone Blog App where user can create, delete, edit articles and much more. This App is created by React.js and backend API is develop using Express.js. Backend API is RESTful and is made in according to RealWorld API specs.
 
-## Available Scripts
+## Badges
 
-In the project directory, you can run:
+[![MIT License](https://img.shields.io/badge/License-MIT-green.svg)](https://choosealicense.com/licenses/mit/)
 
-### `npm start`
+[![React.js](https://img.shields.io/badge/Frontend-React.js-blue)](https://reactjs.org/)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+[![Express](https://img.shields.io/badge/Backend-Express.js-red)](https://reactjs.org/)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Features
 
-### `npm test`
+- User can register and login/Logoutin the App.
+- Add, edit and delete articles.
+- Add, edit and delete User Info.
+- Favorite a post or follow a user.
+- Homepage feed based on followed users and favorited posts.
+- Add comments in articles and delete own comments.
+- View list of articles by Tags.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Screenshots
 
-### `npm run build`
+**User Feed**
+![Screenshot (19)](https://user-images.githubusercontent.com/64186460/203844254-ed093f80-8984-481a-bd9f-8ca119dc4fa2.png)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+**Settings Page**
+![Screenshot (20)](https://user-images.githubusercontent.com/64186460/203844243-cb62ec74-c191-46ef-9292-fea0feea5cf0.png)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Users Articles Page**
+![Screenshot (26)](https://user-images.githubusercontent.com/64186460/203844724-10f26dc3-3d18-49df-ab33-9efd9a868d2d.png)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Article Page**
+![Screenshot (22)](https://user-images.githubusercontent.com/64186460/203844248-7f8513b8-1455-40a5-bf23-c7f709849f4b.png)
 
-### `npm run eject`
+**Other User Page**
+![Screenshot (23)](https://user-images.githubusercontent.com/64186460/203844249-63ed380a-f2be-4c7b-ba76-8375b5bf7c86.png)
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+**Login Page**
+![Screenshot (25)](https://user-images.githubusercontent.com/64186460/203844731-558018f3-3717-452c-99a0-fa21db52e29b.png)
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Run Locally
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Clone the project
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```bash
+  git clone https://github.com/vishmallik/Conduit-blog.git
+```
 
-## Learn More
+Install dependencies
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+```bash
+  npm install
+```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Start the server
 
-### Code Splitting
+```bash
+  npm run start
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+## Demo
 
-### Analyzing the Bundle Size
+https://conduit-blog.netlify.app
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Authors
 
-### Making a Progressive Web App
+- [@vishmallik](https://www.github.com/vishmallik)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Feedback
 
-### Advanced Configuration
+If you have any feedback, please reach out to me at vishmallik@gmail.com
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## License
 
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+[MIT](https://choosealicense.com/licenses/mit/)
