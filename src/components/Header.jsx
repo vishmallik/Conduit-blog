@@ -59,7 +59,7 @@ function NoAuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:px-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.setMenu(!props.menu) : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/login" activeClassName="active-link">
           Sign In
@@ -67,7 +67,7 @@ function NoAuthHeader(props) {
       </li>
       <li
         className={`hover:text-orange-700 sm:pl-4 ${props.menu && "py-4"}`}
-        onClick={props.menu ? props.setMenu(!props.menu) : null}
+        onClick={props.menu ? () => props.setMenu(!props.menu) : null}
       >
         <NavLink to="/register" activeClassName="active-link">
           Sign Up
