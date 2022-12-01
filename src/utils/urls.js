@@ -1,4 +1,4 @@
-const ROOT_URL = "https://mighty-oasis-08080.herokuapp.com/api/";
+const ROOT_URL = "https://api.realworld.io/api/";
 const articlesURL = ROOT_URL + "articles";
 const tagsURL = ROOT_URL + "tags";
 const localStorageKey = "app_user";
